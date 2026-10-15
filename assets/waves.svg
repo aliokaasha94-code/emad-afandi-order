@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="9"/>
+    </filter>
+  </defs>
+  <g filter="url(#soft)" fill="none" stroke-linecap="round">
+    <path d="M-80,120 C 240,60 480,190 800,140 S 1340,60 1700,150" stroke="#a8842f" stroke-width="46" opacity="0.16"/>
+    <path d="M-80,260 C 260,200 500,330 820,270 S 1360,210 1700,300" stroke="#d4af37" stroke-width="34" opacity="0.13"/>
+    <path d="M-80,420 C 300,360 540,480 860,420 S 1380,360 1700,450" stroke="#a8842f" stroke-width="52" opacity="0.11"/>
+    <path d="M-80,600 C 280,540 560,660 880,600 S 1400,540 1700,630" stroke="#d4af37" stroke-width="30" opacity="0.12"/>
+    <path d="M-80,770 C 320,710 580,830 900,770 S 1420,710 1700,800" stroke="#a8842f" stroke-width="44" opacity="0.10"/>
+  </g>
+</svg>

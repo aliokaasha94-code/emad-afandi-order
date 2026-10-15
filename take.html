@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0A0A0A" />
+  <title>عماد أفندي | استلم رقمك</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;700;800&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <div class="bg-waves" aria-hidden="true"></div>
+  <main class="wrap">
+    <header class="brand">
+      <img class="brand-logo" src="assets/logo.png" alt="عماد أفندي" />
+      <div class="sub">تجربة قهوة استثنائية</div>
+      <div class="gold-line"></div>
+    </header>
+
+    <section class="card">
+      <div class="big-ic"><span data-ic="ticket"></span></div>
+      <p class="status-text warm font-head" style="font-weight:900; font-size:24px;">أهلاً بيك!</p>
+      <p class="hint">دوس على الزرار وخد رقمك.. وهنقولك أول ما طلبك يجهز</p>
+      <div style="height:8px"></div>
+      <button class="btn btn-gold" id="takeBtn"><span data-ic="ticket"></span>استلم رقمك</button>
+      <p class="hint" id="takeErr"></p>
+    </section>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="icons.js"></script>
+  <script src="take.js"></script>
+</body>
+</html>

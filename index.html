@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0A0A0A" />
+  <title>عماد أفندي | تابع طلبك</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;700;800&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <div class="bg-waves" aria-hidden="true"></div>
+  <main class="wrap">
+    <header class="brand">
+      <img class="brand-logo" src="assets/logo.png" alt="عماد أفندي" />
+      <div class="sub">قهوتك على مزاجك</div>
+      <div class="gold-line"></div>
+    </header>
+
+    <!-- إزاي هتستلم طلبك (أول مرة بس) -->
+    <section class="card" id="howCard" hidden>
+      <p class="status-text" style="font-weight:800;">إزاي هتستلم طلبك؟</p>
+      <div class="how-steps">
+        <div class="how-step"><span class="how-n">1</span><span>ده رقم طلبك.. احفظه</span></div>
+        <div class="how-step"><span class="how-n">2</span><span>طلبك بيتعمل دلوقتي</span></div>
+        <div class="how-step"><span class="how-n">3</span><span>هنرنّلك أول ما يجهز</span></div>
+      </div>
+      <div style="height:12px"></div>
+      <button class="btn btn-gold" id="howOk">تمام، فهمت</button>
+    </section>
+
+    <!-- إدخال الرقم لو مفيش ?order= في اللينك -->
+    <section class="card" id="enterCard" hidden>
+      <p class="status-text">اكتب رقم الأوردر اللي على الريسيت</p>
+      <div style="height:12px"></div>
+      <input class="order-input" id="orderInput" inputmode="numeric" placeholder="24" />
+      <div style="height:12px"></div>
+      <button class="btn btn-gold" id="goBtn"><span data-ic="back"></span>تابع طلبك</button>
+    </section>
+
+    <!-- كارت المتابعة -->
+    <section class="card" id="trackCard" hidden>
+      <div class="order-no"><span class="hash">#</span><span id="orderNo">–</span></div>
+      <p class="status-text warm" id="statusLine">طلبك بيتعمل دلوقتي..</p>
+
+      <div style="height:16px"></div>
+      <button class="btn btn-gold" id="bellBtn"><span data-ic="bell"></span>شغّل الجرس وجرّبه</button>
+
+      <div id="phoneBox">
+        <label class="phone-label" for="phoneInput">واتسابك (اختياري) لو حبينا نوصلك</label>
+        <input class="phone-input" id="phoneInput" inputmode="tel" placeholder="01xxxxxxxxx" />
+      </div>
+      <button class="btn btn-ghost" id="onWayBtn" hidden><span data-ic="walk"></span>تمام، أنا جاي أستلم</button>
+      <button class="btn btn-green" id="receivedBtn" hidden><span data-ic="check"></span>استلمت</button>
+
+      <p class="hint" id="liveHint">اقعد براحتك.. وأول ما يخلص هنقولك</p>
+    </section>
+
+    <!-- كارت الشكر والتقييم -->
+    <section class="card review-card" id="doneCard" hidden>
+      <div class="stars">★★★★★</div>
+      <p class="status-text">يومك جميل مع عماد أفندي</p>
+      <p class="hint">رأيك يفرق معانا.. قيّمنا وخلّينا دايماً عند حسن ظنك</p>
+      <a id="mapsLink" href="#" target="_blank" rel="noopener"><span data-ic="star"></span>قيّمنا على جوجل ريفيو</a>
+    </section>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="icons.js"></script>
+  <script src="sound.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

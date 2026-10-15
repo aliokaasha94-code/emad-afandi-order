@@ -1,0 +1,395 @@
+/* ============================================================
+   المنادي الذكي - عماد أفندي | styles.css
+   Dark #0A0A0A + Gold #d4af37 + Cream #F5EFE6
+   ============================================================ */
+:root {
+  --bg: #000000;
+  --bg-soft: #0d0d0d;
+  --card: #1a1d1f;
+  --gold: #d4af37;
+  --gold-deep: #9c7c1e;
+  --gold-hover: #e3c15c;
+  --gold-soft: #c6a04a; /* ذهبي هادئ للمساحات الكبيرة */
+  --gold-ink: #241a05;
+  --cream: #ffffff;
+  --muted: rgba(255, 255, 255, 0.55);
+  --green: #22c55e;
+  --red: #e5484d;
+  --radius: 28px;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+[hidden] { display: none !important; }
+
+html, body { overflow-x: clip; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--cream);
+  font-family: "Noto Kufi Arabic", "Outfit", system-ui, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+/* توهجات ذهبية سابحة + حبيبات خفيفة = texture فيها روح */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(700px 340px at 50% -80px, rgba(212, 175, 55, 0.22), rgba(0, 0, 0, 0) 70%),
+    radial-gradient(560px 420px at 88% 42%, rgba(212, 175, 55, 0.08), rgba(0, 0, 0, 0) 70%),
+    radial-gradient(620px 500px at 8% 92%, rgba(212, 175, 55, 0.07), rgba(0, 0, 0, 0) 70%);
+  animation: glowDrift 26s ease-in-out infinite alternate;
+}
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.7'/%3E%3C/svg%3E");
+}
+@keyframes glowDrift {
+  from { transform: translate3d(-3%, -2%, 0) scale(1); }
+  to { transform: translate3d(3%, 3%, 0) scale(1.08); }
+}
+.wrap { position: relative; z-index: 1; }
+
+.font-head { font-family: "Outfit", "Noto Kufi Arabic", sans-serif; }
+
+.wrap {
+  width: 100%;
+  max-width: 480px;
+  min-width: 0;
+  padding: 28px 20px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.brand { text-align: center; }
+.brand-logo {
+  width: 104px; height: 104px;
+  padding: 11px;
+  background: #000;
+  object-fit: contain;
+  border-radius: 50%;
+  border: 2px solid rgba(212, 175, 55, 0.55);
+  box-shadow: 0 8px 32px rgba(212, 175, 55, 0.18);
+}
+.brand { position: relative; }
+.brand .sub { color: var(--muted); font-size: 14px; margin-top: 2px; }
+.gold-line {
+  width: 120px; height: 3px; margin: 12px auto 0;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  border-radius: 99px;
+}
+
+.card {
+  width: 100%;
+  min-width: 0;
+  background: var(--card);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius);
+  padding: 26px 22px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.order-no {
+  direction: ltr;
+  font-weight: 900;
+  font-size: clamp(3rem, 18vw, 5.2rem);
+  line-height: 1;
+  color: var(--cream);
+  font-variant-numeric: tabular-nums;
+}
+.order-no .hash { color: var(--gold); }
+
+.status-text { margin-top: 10px; font-size: 19px; color: var(--cream); }
+.status-text.warm { color: var(--gold); }
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  border: 0;
+  border-radius: 16px;
+  padding: 17px 14px;
+  font-size: 19px;
+  font-weight: 800;
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 0.08s ease, filter 0.15s ease;
+}
+.btn:active { transform: scale(0.98); }
+.btn-gold {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, #d3ae4e, #b28e35 60%, #8f6f24);
+  color: #171106;
+  box-shadow: 0 6px 22px rgba(212, 175, 55, 0.16);
+}
+/* لمعة تعدي على الزرار كل شوية */
+.btn-gold::after {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 45%;
+  left: -60%;
+  background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transform: skewX(-18deg);
+  animation: sheen 4.5s ease-in-out infinite;
+}
+@keyframes sheen {
+  0%, 60% { left: -60%; }
+  100% { left: 130%; }
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--cream);
+  border: 1.5px solid rgba(212, 175, 55, 0.5);
+  margin-top: 10px;
+}
+.btn-green { background: var(--green); color: #06130a; }
+.btn-red { background: transparent; color: var(--red); border: 1.5px solid var(--red); margin-top: 10px; }
+.btn[disabled] { opacity: 0.55; cursor: default; }
+
+.hint { color: var(--muted); font-size: 13.5px; line-height: 1.9; }
+.hint code { direction: ltr; unicode-bidi: isolate; color: var(--gold); }
+
+/* دخول ناعم متدرج لعناصر الصفحة */
+.wrap > * { animation: rise 0.55s cubic-bezier(0.22, 0.9, 0.3, 1) both; }
+.wrap > *:nth-child(2) { animation-delay: 0.07s; }
+.wrap > *:nth-child(3) { animation-delay: 0.14s; }
+.wrap > *:nth-child(4) { animation-delay: 0.21s; }
+.wrap > *:nth-child(5) { animation-delay: 0.28s; }
+@keyframes rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* اللوجو يطفو بهدوء */
+.brand-logo { animation: floaty 5s ease-in-out infinite; }
+@keyframes floaty {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+/* نبض لطيف لزرار الجرس عشان يلفت العين */
+#bellBtn:not([disabled]) { animation: bellGlow 2.6s ease-in-out infinite; }
+@keyframes bellGlow {
+  0%, 100% { box-shadow: 0 6px 22px rgba(212, 175, 55, 0.16); }
+  50% { box-shadow: 0 6px 30px rgba(212, 175, 55, 0.38); }
+}
+
+/* نقطة حية جنب التايمر */
+.livedot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--gold);
+  margin-inline-end: 6px;
+  animation: dotPing 1.8s ease-out infinite;
+}
+@keyframes dotPing {
+  0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.5); }
+  100% { box-shadow: 0 0 0 9px rgba(212, 175, 55, 0); }
+}
+
+/* كروت الأوردرات تدخل بفرقعة خفيفة */
+.order-card { animation: pop 0.3s ease both; }
+@keyframes pop {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* فلاش ذهبي عند ضغط أرقام الكيباد */
+.numpad button:active { background: #2a230f; border-color: var(--gold); }
+
+/* خط ذهبي متحرك تحت اللوجو */
+.gold-line {
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  background-size: 200% 100%;
+  animation: lineFlow 5s linear infinite;
+}
+@keyframes lineFlow {
+  from { background-position: 100% 0; }
+  to { background-position: -100% 0; }
+}
+
+/* الـ QR يكبر سنة على اللمس */
+.qr { transition: transform 0.2s ease; }
+.qr:hover { transform: scale(1.04); }
+
+/* أيقونات فيكتور */
+.ic { width: 1.25em; height: 1.25em; flex: none; }
+.big-ic { display: flex; justify-content: center; }
+.big-ic .ic { width: 58px; height: 58px; color: var(--gold); }
+.review-card a { display: inline-flex; align-items: center; gap: 8px; }
+
+/* طبقة الموجات الذهبية السابحة */
+.bg-waves {
+  position: fixed;
+  inset: 0;
+  background: url("assets/waves.svg") center / cover no-repeat;
+  opacity: 0.55;
+  pointer-events: none;
+  animation: waveDrift 18s ease-in-out infinite alternate;
+}
+@keyframes waveDrift {
+  from { transform: translate3d(-1.5%, 0, 0) scale(1); }
+  to { transform: translate3d(1.5%, -1%, 0) scale(1.03); }
+}
+/* خطوات الاستلام (أول مرة للعميل) */
+.how-steps { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+.how-step {
+  display: flex; align-items: center; gap: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-size: 15.5px;
+  animation: rise 0.5s ease both;
+}
+.how-step:nth-child(2) { animation-delay: 0.08s; }
+.how-step:nth-child(3) { animation-delay: 0.16s; }
+.how-n {
+  flex: none;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: rgba(212, 175, 55, 0.15);
+  border: 1px solid rgba(212, 175, 55, 0.5);
+  color: var(--gold);
+  font-weight: 900;
+  display: flex; align-items: center; justify-content: center;
+}
+
+body.is-ready { background: #0a0a0a; }
+body.is-ready .card-ready {
+  animation: goldPulse 1.6s ease-in-out infinite;
+  border-color: var(--gold);
+}
+@keyframes goldPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.55), 0 0 40px rgba(212, 175, 55, 0.25); }
+  50% { box-shadow: 0 0 0 18px rgba(212, 175, 55, 0), 0 0 90px rgba(212, 175, 55, 0.55); }
+}
+.ready-title { font-size: clamp(1.6rem, 7vw, 2.3rem); font-weight: 900; color: var(--gold); }
+
+/* إدخال رقم الأوردر */
+.order-input {
+  width: 100%;
+  direction: ltr;
+  text-align: center;
+  font-size: 28px;
+  font-weight: 800;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1.5px solid rgba(212, 175, 55, 0.5);
+  background: #0e0e0e;
+  color: var(--cream);
+  font-family: inherit;
+}
+
+/* كارت التقييم */
+.review-card a {
+  display: inline-block;
+  margin-top: 8px;
+  color: #1a1405;
+  background: var(--gold);
+  font-weight: 800;
+  text-decoration: none;
+  padding: 12px 26px;
+  border-radius: 99px;
+}
+.stars { font-size: 30px; letter-spacing: 4px; color: var(--gold); }
+
+/* ===== شاشة المطبخ ===== */
+.wrap-wide { max-width: 860px; }
+.pin-box { display: flex; gap: 10px; justify-content: center; direction: ltr; }
+.pin-box input {
+  width: 62px; height: 72px;
+  text-align: center; font-size: 34px; font-weight: 900;
+  border-radius: 14px; border: 1.5px solid rgba(212, 175, 55, 0.5);
+  background: #0e0e0e; color: var(--gold); font-family: inherit;
+}
+
+.numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; direction: ltr; }
+.numpad button {
+  padding: 16px 0;
+  font-size: 26px; font-weight: 900;
+  border-radius: 14px;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  background: #101010; color: var(--cream);
+  cursor: pointer; font-family: inherit;
+}
+.numpad button:active { transform: scale(0.96); background: #1d1a10; }
+.numpad .wide { grid-column: span 3; font-size: 20px; }
+
+.orders { width: 100%; display: grid; gap: 12px; grid-template-columns: 1fr; }
+@media (min-width: 640px) { .orders { grid-template-columns: 1fr 1fr; } }
+.order-card {
+  background: #141414;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 18px;
+  padding: 16px;
+  text-align: center;
+}
+.order-card.is-ready { border-color: var(--green); box-shadow: 0 0 24px rgba(34, 197, 94, 0.25); }
+.order-card .num { direction: ltr; font-size: 40px; font-weight: 900; }
+.order-card .timer { color: var(--muted); font-size: 14px; margin: 2px 0 10px; font-variant-numeric: tabular-nums; }
+.order-card .row { display: flex; gap: 8px; }
+.order-card .row .btn { font-size: 16px; padding: 13px 8px; margin-top: 8px; }
+.track-link { direction: ltr; font-size: 12px; color: var(--muted); word-break: break-all; margin-top: 8px; }
+
+.topbar { width: 100%; display: flex; align-items: center; justify-content: space-between; }
+.topbar .count {
+  background: rgba(212, 175, 55, 0.15);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  color: var(--gold);
+  border-radius: 99px;
+  padding: 6px 16px;
+  font-weight: 800;
+}
+
+/* كارت QR */
+.qr {
+  width: 170px; height: 170px;
+  background: #fff;
+  padding: 10px;
+  border-radius: 14px;
+  border: 2px solid var(--gold);
+  margin: 10px auto;
+  display: block;
+}
+.rowbtn { display: flex; gap: 8px; }
+.rowbtn .btn { margin-top: 8px; }
+.btn-wa { background: #25d366; color: #062b16; margin-top: 8px; }
+.phone-input {
+  width: 100%;
+  direction: ltr;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 700;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1.5px solid rgba(212, 175, 55, 0.5);
+  background: #0e0e0e;
+  color: var(--cream);
+  font-family: inherit;
+}
+.phone-label { display: block; margin: 14px 0 6px; color: var(--muted); font-size: 14px; }
+
+@media (prefers-reduced-motion: reduce) {
+  body.is-ready .card-ready, body::before { animation: none; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition: none !important; }
+}

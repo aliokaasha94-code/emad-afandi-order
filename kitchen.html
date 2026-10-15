@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0A0A0A" />
+  <title>عماد أفندي | شاشة الباريستا</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;700;800&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <div class="bg-waves" aria-hidden="true"></div>
+  <main class="wrap wrap-wide">
+    <header class="brand">
+      <img class="brand-logo" src="assets/logo.png" alt="عماد أفندي" />
+      <div class="gold-line"></div>
+    </header>
+
+    <!-- بوابة PIN -->
+    <section class="card" id="pinCard">
+      <p class="status-text">دخل PIN الكاشير</p>
+      <div style="height:12px"></div>
+      <div class="pin-box" dir="ltr">
+        <input id="p0" inputmode="numeric" maxlength="1" autocomplete="off" />
+        <input id="p1" inputmode="numeric" maxlength="1" autocomplete="off" />
+        <input id="p2" inputmode="numeric" maxlength="1" autocomplete="off" />
+        <input id="p3" inputmode="numeric" maxlength="1" autocomplete="off" />
+      </div>
+      <div style="height:12px"></div>
+      <button class="btn btn-gold" id="pinBtn"><span data-ic="lock"></span>دخول</button>
+      <p class="hint" id="pinErr"></p>
+    </section>
+
+    <!-- الشاشة الرئيسية -->
+    <div id="mainBox" hidden style="width:100%; display:flex; flex-direction:column; gap:18px; align-items:center;">
+      <section class="card">
+        <div class="topbar">
+          <span class="font-head" style="font-weight:900; font-size:20px;"><span data-ic="plus"></span>أوردر جديد</span>
+          <span class="count" id="activeCount">0 نشط</span>
+        </div>
+        <div style="height:10px"></div>
+        <div class="order-no" style="font-size:clamp(2.2rem,10vw,3rem);" id="padView">–</div>
+        <div class="numpad" id="numpad">
+          <button data-d="1">1</button><button data-d="2">2</button><button data-d="3">3</button>
+          <button data-d="4">4</button><button data-d="5">5</button><button data-d="6">6</button>
+          <button data-d="7">7</button><button data-d="8">8</button><button data-d="9">9</button>
+          <button data-d="C">مسح</button><button data-d="0">0</button><button data-d="B">⌫</button>
+          <button class="btn btn-gold wide" id="addBtn" style="margin-top:4px;"><span data-ic="plus"></span>إضافة</button>
+        </div>
+              </section>
+
+      <section class="orders" id="orders"></section>
+
+      <section class="card">
+        <div class="topbar">
+          <span class="font-head" style="font-weight:900; font-size:20px;">QR الكاونتر الثابت</span>
+        </div>
+        <p class="hint">اطبعه وحطه على الكاونتر — العميل يمسحه وياخد رقم عشوائي لوحده</p>
+        <img class="qr" id="takeQr" alt="QR الكاونتر" />
+        <div class="rowbtn">
+          <button class="btn btn-gold" id="copyTake"><span data-ic="copy"></span>نسخ اللينك</button>
+          <button class="btn btn-ghost" id="printTake"><span data-ic="printer"></span>اطبع</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="icons.js"></script>
+  <script src="sound.js"></script>
+  <script src="kitchen.js"></script>
+</body>
+</html>
