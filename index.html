@@ -5,6 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#0A0A0A" />
   <title>عماد أفندي | تابع طلبك</title>
+  <script>
+    // اللينك الرئيسي مخصص للكاشير: حول عليه فوراً،
+    // إلا لو اللينك فيه رقم أوردر (?order=) يبقى ده عميل جاي من QR ويفضل هنا.
+    (function () {
+      try {
+        if (!new URLSearchParams(location.search).get("order")) {
+          location.replace("kitchen.html");
+        }
+      } catch (e) { /* خلّيه على الصفحة الحالية */ }
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;700;800&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet" />
