@@ -2,82 +2,199 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#0A0A0A" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="theme-color" content="#000000" />
   <title>عماد أفندي | تابع طلبك</title>
   <script>
-    // اللينك الرئيسي مخصص للكاشير: حول عليه فوراً،
-    // إلا لو اللينك فيه رقم أوردر (?order=) يبقى ده عميل جاي من QR ويفضل هنا.
     (function () {
       try {
-        if (!new URLSearchParams(location.search).get("order")) {
-          location.replace("kitchen.html");
+        const p = new URLSearchParams(location.search);
+        if (!p.get("order") && !sessionStorage.getItem("emad_stay_home")) {
+          if (window.innerWidth > 768) {
+            location.replace("kitchen.html");
+          }
         }
-      } catch (e) { /* خلّيه على الصفحة الحالية */ }
+      } catch (e) {}
     })();
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;700;800&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;700;800;900&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <div class="bg-waves" aria-hidden="true"></div>
+
   <main class="wrap">
+    <!-- العلامة التجارية الأصلية لعماد أفندي -->
     <header class="brand">
       <img class="brand-logo" src="assets/logo.png" alt="عماد أفندي" />
       <div class="sub">قهوتك على مزاجك</div>
       <div class="gold-line"></div>
     </header>
 
-    <!-- إزاي هتستلم طلبك (أول مرة بس) -->
-    <section class="card" id="howCard" hidden>
-      <p class="status-text" style="font-weight:800;">إزاي هتستلم طلبك؟</p>
-      <div class="how-steps">
-        <div class="how-step"><span class="how-n">1</span><span>ده رقم طلبك.. احفظه</span></div>
-        <div class="how-step"><span class="how-n">2</span><span>طلبك بيتعمل دلوقتي</span></div>
-        <div class="how-step"><span class="how-n">3</span><span>هنرنّلك أول ما يجهز</span></div>
-      </div>
-      <div style="height:12px"></div>
-      <button class="btn btn-gold" id="howOk">تمام، فهمت</button>
-    </section>
-
-    <!-- إدخال الرقم لو مفيش ?order= في اللينك -->
+    <!-- 1. إدخال الرقم يدوياً لو مفيش ?order= في الرابط -->
     <section class="card" id="enterCard" hidden>
-      <p class="status-text">اكتب رقم الأوردر اللي على الريسيت</p>
+      <p class="status-text warm" style="font-weight:800; font-size:18px;">اكتب رقم الأوردر اللي على الريسيت</p>
       <div style="height:12px"></div>
       <input class="order-input" id="orderInput" inputmode="numeric" placeholder="24" />
-      <div style="height:12px"></div>
+      <div style="height:14px"></div>
       <button class="btn btn-gold" id="goBtn"><span data-ic="back"></span>تابع طلبك</button>
+      <p class="hint">أو امسح كود QR المطبوع على البون بكاميرا الموبايل</p>
     </section>
 
-    <!-- كارت المتابعة -->
-    <section class="card" id="trackCard" hidden>
-      <div class="order-no"><span class="hash">#</span><span id="orderNo">–</span></div>
-      <p class="status-text warm" id="statusLine">طلبك بيتعمل دلوقتي..</p>
+    <!-- 2. كارت التذكرة الفندقية الفاخرة أثناء الانتظار (قيد التحضير) -->
+    <div id="trackWrapper" hidden style="width:100%; display:flex; flex-direction:column; gap:16px;">
+      
+      <!-- التذكرة الورقية الفاخرة ذات الحواف المقصوصة -->
+      <section class="ticket-card" id="ticketCard">
+        <div class="ticket-notch-l"></div>
+        <div class="ticket-notch-r"></div>
+        <div class="ticket-divider"></div>
 
-      <div style="height:16px"></div>
-      <button class="btn btn-gold" id="bellBtn"><span data-ic="bell"></span>شغّل الجرس وجرّبه</button>
+        <!-- النصف العلوي: رقم الطلب -->
+        <div class="ticket-top">
+          <div class="ticket-label">رقم طلبك</div>
+          <div class="order-no"><span class="hash">#</span><span id="orderNo">–</span></div>
+          <div id="orderItemsText" style="font-size:13px; color:var(--muted); margin-top:4px;"></div>
+        </div>
 
-      <div id="phoneBox">
-        <label class="phone-label" for="phoneInput">واتسابك (اختياري) لو حبينا نوصلك</label>
-        <input class="phone-input" id="phoneInput" inputmode="tel" placeholder="01xxxxxxxxx" />
+        <!-- النصف السفلي: شريط المراحل الثلاث وصندوق المعلومات -->
+        <div class="ticket-bottom">
+          <div class="stepper">
+            <!-- مرحلة 1 -->
+            <div class="step-node done" id="step1">
+              <div class="step-circle done"><span data-ic="check"></span></div>
+              <span class="step-text">استلمنا طلبك</span>
+            </div>
+            <div class="step-line done" id="line1"></div>
+
+            <!-- مرحلة 2 -->
+            <div class="step-node active" id="step2">
+              <div class="step-circle active">2</div>
+              <span class="step-text">قيد التحضير</span>
+            </div>
+            <div class="step-line" id="line2"></div>
+
+            <!-- مرحلة 3 -->
+            <div class="step-node" id="step3">
+              <div class="step-circle">3</div>
+              <span class="step-text">جاهز</span>
+            </div>
+          </div>
+
+          <!-- صندوق التنبيه التفاعلي -->
+          <div class="smart-info-box">
+            <span class="icon">🕒</span>
+            <div>
+              <div class="title" id="smartInfoTitle">هنرنّلك أول ما يجهز</div>
+              <div class="desc" id="smartInfoDesc">طلبك هو التالي • بنحضّر قهوتك على مزاجك</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- كارت تفعيل التنبيهات مع فحص الصوت -->
+      <section class="notify-card" id="notifyCard">
+        <div class="notify-info">
+          <div class="notify-badge">✓</div>
+          <div>
+            <div class="notify-text-title">التنبيه مفّعل</div>
+            <div class="notify-text-sub">رح يوصلك تنبيه حتى لو قفلت الشاشة</div>
+          </div>
+        </div>
+        <button class="test-sound-btn" id="bellBtn"><span data-ic="volume"></span>جرّب الصوت</button>
+      </section>
+
+      <!-- حقل اسم العميل الاختياري -->
+      <div class="name-input-wrap">
+        <input class="name-input" id="nameInput" placeholder="✏️ اسمك (اختياري) للباريستا" />
       </div>
-      <button class="btn btn-ghost" id="onWayBtn" hidden><span data-ic="walk"></span>تمام، أنا جاي أستلم</button>
-      <button class="btn btn-green" id="receivedBtn" hidden><span data-ic="check"></span>استلمت</button>
 
-      <p class="hint" id="liveHint">اقعد براحتك.. وأول ما يخلص هنقولك</p>
-    </section>
+      <p class="hint" style="text-align:center;">اقعد براحتك.. أول ما يخلص فنجانك هيرن جوالك ويهتز</p>
+    </div>
 
-    <!-- كارت الشكر والتقييم -->
+    <!-- 3. شاشة الجاهزية الملكية المتوهجة (طلبك جاهز!) -->
+    <div id="readyWrapper" hidden style="width:100%; display:flex; flex-direction:column; align-items:center; text-align:center; gap:16px;">
+      
+      <!-- جرس الجاهزية الذهبي المتوهج -->
+      <div class="ready-bell-box">
+        <span data-ic="bell" style="width:42px; height:42px;"></span>
+      </div>
+
+      <h1 class="ready-title font-head">طلبك جاهز!</h1>
+      <p class="ready-sub">تفضّل استلمه من الكاونتر.. بالهنا والشفا</p>
+
+      <!-- كارت الاستلام الأسود مع الختم الذهبي -->
+      <div class="ready-ticket">
+        <div class="watermark-stamp">جاهز</div>
+        <div style="font-size:14px; font-weight:700; color:var(--gold-soft);">ورّي هالرقم للكاشير</div>
+        <div class="order-no" style="font-size:clamp(4.2rem,22vw,6rem); margin-top:4px;">
+          <span class="hash">#</span><span id="readyOrderNo">–</span>
+        </div>
+        <p class="hint" id="readyItemsDesc" style="margin-top:6px;"></p>
+      </div>
+
+      <!-- زر "أنا جاي" الفاخر -->
+      <button id="onWayBtn">
+        <span data-ic="walk"></span>
+        <span id="onWayText">أنا جاي أستلم</span>
+      </button>
+
+      <button class="btn btn-green" id="receivedBtn" style="margin-top:4px;">
+        <span data-ic="check"></span>استلمت خلاص
+      </button>
+    </div>
+
+    <!-- 4. كارت الشكر والتقييم بعد الاستلام -->
     <section class="card review-card" id="doneCard" hidden>
       <div class="stars">★★★★★</div>
-      <p class="status-text">يومك جميل مع عماد أفندي</p>
-      <p class="hint">رأيك يفرق معانا.. قيّمنا وخلّينا دايماً عند حسن ظنك</p>
-      <a id="mapsLink" href="#" target="_blank" rel="noopener"><span data-ic="star"></span>قيّمنا على جوجل ريفيو</a>
+      <h2 style="font-size:24px; font-weight:900; margin-top:8px; color:var(--cream);">يومك جميل مع عماد أفندي</h2>
+      <p class="hint">بالهنا والشفا.. قهوتك دايماً على مزاجك. رأيك يفرق معانا جداً:</p>
+      <div style="height:8px"></div>
+      <a id="mapsLink" href="https://www.google.com/maps/search/?api=1&query=عماد+أفندي+كفر+الشيخ" target="_blank" rel="noopener">
+        <span data-ic="star"></span>قيّمنا على جوجل ريفيو
+      </a>
     </section>
   </main>
+
+  <!-- 5. نافذة الشرح الترحيبية (Onboarding Modal - Bottom Sheet) -->
+  <div class="modal-overlay" id="howModal" hidden>
+    <div class="modal-content">
+      <div class="modal-header">
+        <span style="font-weight:800; font-size:14px; color:var(--gold);">عماد أفندي ☕</span>
+        <button class="modal-close" id="howClose">✕</button>
+      </div>
+
+      <div class="modal-title font-head">إزاي بيشتغل المنادي الذكي؟</div>
+
+      <div class="how-cards-grid">
+        <div class="how-card-box">
+          <div class="how-card-badge"><span data-ic="ticket"></span></div>
+          <div class="how-card-title">1. رقم طلبك</div>
+          <div class="how-card-desc">احفظ الرقم اللي على الريسيت</div>
+        </div>
+
+        <div class="how-card-box">
+          <div class="how-card-badge"><span data-ic="coffee"></span></div>
+          <div class="how-card-title">2. بنحضّر طلبك</div>
+          <div class="how-card-desc">قهوتك بتتعمل على مزاجك</div>
+        </div>
+
+        <div class="how-card-box">
+          <div class="how-card-badge" style="background:var(--gold); color:#000;"><span data-ic="bell"></span></div>
+          <div class="how-card-title">3. جوالك هيرن</div>
+          <div class="how-card-desc">رنين واهتزاز أول ما يجهز</div>
+        </div>
+      </div>
+
+      <button class="modal-action-btn font-head" id="howOk">
+        <span data-ic="bell"></span> تمام، رنّلي لما يجهز
+      </button>
+      <p class="hint" style="text-align:center; margin-top:8px;">بعدها هيسألك المتصفح: اضغط «سماح» للإشعارات</p>
+    </div>
+  </div>
 
   <script src="config.js"></script>
   <script src="icons.js"></script>
