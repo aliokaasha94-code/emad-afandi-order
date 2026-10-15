@@ -79,12 +79,22 @@
       if (bc) bc.postMessage(msg);
     } catch { /* لا يدعم */ }
   }
+  // بناء الروابط من الـ origin + فولدر الصفحة (شغال مع .html ومع clean URLs ومع localhost)
+  function baseDir() {
+    try {
+      const u = new URL(location.href);
+      let dir = u.pathname;
+      if (!dir.endsWith("/")) dir = dir.slice(0, dir.lastIndexOf("/") + 1);
+      return u.origin + dir;
+    } catch {
+      return "./";
+    }
+  }
   function trackUrl(order) {
-    const base = location.href.replace(/kitchen\.html.*$/, "");
-    return base + "index.html?order=" + encodeURIComponent(order);
+    return baseDir() + "?order=" + encodeURIComponent(order);
   }
   function takeUrl() {
-    return location.href.replace(/kitchen\.html.*$/, "") + "take.html";
+    return baseDir() + "take";
   }
   function qrSrc(url) {
     return "https://api.qrserver.com/v1/create-qr-code/?size=170x170&data=" + encodeURIComponent(url);

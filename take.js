@@ -70,7 +70,8 @@
       const { set, sb } = await activeNumbers();
       const num = pickRandom(set);
       await createOrder(num, sb);
-      location.href = "index.html?order=" + encodeURIComponent(num);
+      // لينك نظيف يشتغل على localhost وعلى Cloudflare (clean URLs)
+      location.href = "./?order=" + encodeURIComponent(num);
     } catch (e) {
       btn.disabled = false;
       btn.textContent = "استلم رقمك";
