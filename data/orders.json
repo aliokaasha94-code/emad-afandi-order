@@ -1,0 +1,28 @@
+[
+  {
+    "id": "aada22715919",
+    "branch_slug": "emad-kafrelsheikh",
+    "order_number": "1",
+    "items": "2 قهوة تركي زيادة، 1 شاي بالنعناع",
+    "customer_name": "أحمد علي",
+    "customer_on_way": true,
+    "on_way_at": "2026-10-15T20:04:44.364Z",
+    "status": "picked_up",
+    "created_at": "2026-10-15T20:04:34.070Z",
+    "ready_at": "2026-10-15T20:04:42.423Z",
+    "token_hash": "ac001f25b7caf5f3ed889d7a30928f9524da15af4843f3cc8d0a526548c92cb6"
+  },
+  {
+    "id": "65b07777b5d1",
+    "branch_slug": "emad-kafrelsheikh",
+    "order_number": "11",
+    "items": "",
+    "customer_name": "",
+    "customer_on_way": false,
+    "on_way_at": null,
+    "status": "received",
+    "created_at": "2026-10-15T20:10:04.606Z",
+    "ready_at": null,
+    "token_hash": "05127fe9c2eca7aaa757fb9d340e87ef062fa0e3ce3320e0c9a29dc0d4295963"
+  }
+]

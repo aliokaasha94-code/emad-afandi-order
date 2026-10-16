@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #F9F8F3;
+  --text: #14171A;
+  --lime: #B5FF14;
+}
+
+html, body {
+  overflow-x: clip;
+  background-color: var(--bg);
+  color: var(--text);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Scalloped ticket cutouts on left and right edges */
+.ticket-card {
+  position: relative;
+  background: #ffffff;
+  border-radius: 28px;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.06);
+}
+
+.ticket-notch-left, .ticket-notch-right {
+  position: absolute;
+  top: 48%;
+  width: 24px;
+  height: 24px;
+  background: var(--bg);
+  border-radius: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+}
+
+.ticket-notch-left {
+  left: -12px;
+}
+
+.ticket-notch-right {
+  right: -12px;
+}
+
+.ticket-divider {
+  position: absolute;
+  top: 48%;
+  left: 20px;
+  right: 20px;
+  border-bottom: 2px dashed #ECEAE1;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+/* Watermark stamp for Ready state */
+.watermark-stamp {
+  position: absolute;
+  top: 18px;
+  left: 20px;
+  border: 3px solid rgba(181, 255, 20, 0.28);
+  color: rgba(181, 255, 20, 0.28);
+  font-family: 'Cairo', sans-serif;
+  font-weight: 900;
+  font-size: 20px;
+  padding: 2px 14px;
+  border-radius: 10px;
+  transform: rotate(-12deg);
+  pointer-events: none;
+  user-select: none;
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.08); opacity: 0.85; }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 1.8s ease-in-out infinite;
+}
+
+@media print {
+  .no-print { display: none !important; }
+  .print-only { display: block !important; }
+}

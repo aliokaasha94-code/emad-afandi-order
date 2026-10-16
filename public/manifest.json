@@ -1,0 +1,12 @@
+{
+  "name": "عماد أفندي | المنادي الذكي",
+  "short_name": "عماد أفندي",
+  "description": "نظام المنادي الذكي لمتابعة طلبك بدون أجهزة نداء",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F9F8F3",
+  "theme_color": "#121517",
+  "orientation": "portrait",
+  "lang": "ar",
+  "dir": "rtl"
+}
