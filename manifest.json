@@ -1,0 +1,21 @@
+{
+  "name": "عماد أفندي | نظام إدارة الطلبات والمنادي",
+  "short_name": "عماد أفندي",
+  "description": "نظام المنادي الذكي وإدارة طلبات كافيه عماد أفندي - متابعة واستلام الطلبات لحظياً",
+  "start_url": "/kitchen",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0A0A0A",
+  "theme_color": "#C5A059",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "assets/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://emad-afandi-order.pages.dev/sitemap.xml
