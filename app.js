@@ -75,8 +75,19 @@
           }
         })
         .subscribe();
+
+      // فحص دوري كل 3 ثواني كخط دفاع ثانٍ لو انقطع الـ WebSocket في خلفية الموبايل
+      setInterval(() => {
+        if (!sb) return;
+        sb.from(CFG.TABLE).select("*").eq("order_number", order).maybeSingle().then(({ data }) => {
+          if (data && data.status && data.status !== currentStatus) {
+            render(data.status, data);
+          }
+        });
+      }, 3000);
     } catch (e) {
       console.warn("Supabase init error, falling back to local:", e);
+      initLocal(order);
     }
   }
 
@@ -120,7 +131,7 @@
     if (window.EmadSound) {
       window.EmadSound.startChimeLoop(CFG.CHIME_EVERY_MS || 3500);
     }
-    document.title = "🔔 طلبك جاهز! #" + orderNo + " - عماد أفندي";
+    document.title = "طلبك جاهز! #" + orderNo + " - عماد أفندي";
   }
 
   /* ---------- عرض الحالات المختلفة (UI States) ---------- */
@@ -166,7 +177,8 @@
   /* ---------- إرسال إشارة "أنا جاي" للكاشير ---------- */
   async function sendOnWay() {
     if (window.EmadSound) window.EmadSound.stopChimeLoop();
-    onWayText.textContent = "✓ بلّغنا الكاشير إنك في الطريق";
+    onWayText.innerHTML = '<span data-ic="check"></span>بلّغنا الكاشير إنك في الطريق';
+    if (window.EmadIcons) window.EmadIcons.hydrate(onWayBtn);
     onWayBtn.disabled = true;
     onWayBtn.style.background = "rgba(212, 175, 55, 0.25)";
     onWayBtn.style.color = "var(--gold-bright)";
@@ -244,8 +256,6 @@
         window.EmadSound.playPagerChime();
         if (navigator.vibrate) navigator.vibrate([300, 150, 300]);
       }
-      bellBtn.innerHTML = '<span data-ic="check"></span>✓ تمام الصوت شغال';
-      if (window.EmadIcons) window.EmadIcons.hydrate(bellBtn);
     });
   }
 

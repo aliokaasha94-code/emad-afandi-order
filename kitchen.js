@@ -225,7 +225,7 @@
     ordersEl.innerHTML = "";
 
     if (!keys.length) {
-      ordersEl.innerHTML = '<p class="hint" style="grid-column:1/-1; text-align:center; padding:30px 0; font-size:16px;">مفيش أوردرات نشطة.. الدنيا رايقة ☕</p>';
+      ordersEl.innerHTML = '<p class="hint" style="grid-column:1/-1; text-align:center; padding:30px 0; font-size:16px;">مفيش أوردرات نشطة حالياً</p>';
       return;
     }
 
@@ -245,7 +245,7 @@
 
       card.innerHTML =
         '<div class="num">#' + escapeHtml(order) + "</div>" +
-        (o.name ? '<div class="customer-badge">👤 ' + escapeHtml(o.name) + '</div>' : '') +
+        (o.name ? '<div class="customer-badge"><span data-ic="user"></span>' + escapeHtml(o.name) + '</div>' : '') +
         '<div class="timer" data-t="' + o.createdAt + '"><span class="livedot"></span>' + fmt(Date.now() - o.createdAt) + "</div>" +
         (isOnWay
           ? '<div class="on-way-alert"><span data-ic="walk"></span>العميل في الطريق للاستلام الآن!</div>'
@@ -256,24 +256,13 @@
           : '<button class="btn btn-gold" data-a="ready"><span data-ic="bell"></span>جاهز للاستلام</button>') +
         '<button class="btn btn-red" data-a="done"><span data-ic="check"></span>تم التسليم</button>' +
         "</div>" +
-        '<div class="rowbtn" style="margin-top:10px;">' +
-        '<button class="btn btn-ghost" data-a="show-qr"><span data-ic="ticket"></span>عرض QR</button>' +
-        '<button class="btn btn-ghost" data-a="copy"><span data-ic="copy"></span>نسخ الرابط</button>' +
+        '<div style="margin-top:10px;">' +
+        '<button class="btn btn-ghost wide" data-a="show-qr"><span data-ic="ticket"></span>عرض QR</button>' +
         '</div>';
 
       card.querySelector('[data-a="ready"]')?.addEventListener("click", () => setStatus(order, "ready"));
       card.querySelector('[data-a="recall"]')?.addEventListener("click", () => setStatus(order, "ready", true));
       card.querySelector('[data-a="done"]').addEventListener("click", () => setStatus(order, "done"));
-      
-      card.querySelector('[data-a="copy"]').addEventListener("click", async (e) => {
-        const ok = await copyText(trackUrl(order));
-        const b = e.target.closest("button");
-        if (ok && b) {
-          b.textContent = "✓ تم النسخ";
-          setTimeout(() => (b.innerHTML = '<span data-ic="copy"></span>نسخ الرابط'), 1500);
-          if (window.EmadIcons) window.EmadIcons.hydrate(b);
-        }
-      });
 
       card.querySelector('[data-a="show-qr"]').addEventListener("click", () => {
         showCounterQrModal(order, trackUrl(order));
@@ -296,11 +285,11 @@
         '<div class="modal-content" style="text-align:center;">' +
         '<div class="modal-header">' +
         '<span style="font-weight:800; font-size:16px; color:var(--gold);">كود العميل</span>' +
-        '<button class="modal-close" id="qrPopupClose">✕</button>' +
+        '<button class="modal-close" id="qrPopupClose"><span data-ic="close"></span></button>' +
         '</div>' +
         '<div class="order-no" id="qrPopupOrderNo"></div>' +
         '<img id="qrPopupImg" class="qr" style="width:240px; height:240px; margin:16px auto;" />' +
-        '<p class="hint">امسح الكود بكاميرا الموبايل لمتابعة الطلب فوراً</p>' +
+        '<p class="hint">امسح الكود لمتابعة طلبك</p>' +
         '</div>';
       document.body.appendChild(modal);
       modal.querySelector("#qrPopupClose").addEventListener("click", () => {
@@ -310,6 +299,7 @@
     modal.querySelector("#qrPopupOrderNo").textContent = "#" + order;
     modal.querySelector("#qrPopupImg").src = qrSrc(url);
     modal.hidden = false;
+    if (window.EmadIcons) window.EmadIcons.hydrate(modal);
   }
 
   // تحديث عدادات الوقت كل ثانية
@@ -340,33 +330,37 @@
   /* ---------- إقلاع الشاشة (Boot) ---------- */
   function boot() {
     const tu = takeUrl();
-    $("takeQr").src = qrSrc(tu);
+    if ($("takeQr")) $("takeQr").src = qrSrc(tu);
 
-    $("copyTake").addEventListener("click", async () => {
-      const ok = await copyText(tu);
-      if (ok) {
-        $("copyTake").textContent = "✓ تم النسخ";
-        setTimeout(() => ($("copyTake").innerHTML = '<span data-ic="copy"></span>نسخ اللينك'), 1500);
-        if (window.EmadIcons) window.EmadIcons.hydrate($("copyTake"));
-      }
-    });
+    if ($("copyTake")) {
+      $("copyTake").addEventListener("click", async () => {
+        const ok = await copyText(tu);
+        if (ok) {
+          $("copyTake").innerHTML = '<span data-ic="check"></span>تم النسخ';
+          setTimeout(() => ($("copyTake").innerHTML = '<span data-ic="copy"></span>نسخ اللينك'), 1500);
+          if (window.EmadIcons) window.EmadIcons.hydrate($("copyTake"));
+        }
+      });
+    }
 
-    $("printTake").addEventListener("click", () => {
-      const w = window.open("", "_blank");
-      if (!w) return;
-      w.document.write(
-        "<html dir='rtl'><head><title>QR الكاونتر - عماد أفندي</title></head>" +
-          "<body style='text-align:center;font-family:sans-serif;padding:40px;background:#fff;color:#000;'>" +
-          "<h1 style='font-size:32px;margin-bottom:4px;'>عماد أفندي</h1>" +
-          "<p style='font-size:18px;margin-top:0;'>قهوتك على مزاجك</p>" +
-          "<hr style='margin:20px 0;'/>" +
-          "<h2>امسح الكود وخد رقمك</h2>" +
-          "<img src='" + qrSrc(tu) + "' style='width:300px;height:300px;margin:20px 0;' />" +
-          "<p style='font-size:14px;direction:ltr;'>" + tu + "</p>" +
-          "<script>onload=()=>{print();}<\/script></body></html>"
-      );
-      w.document.close();
-    });
+    if ($("printTake")) {
+      $("printTake").addEventListener("click", () => {
+        const w = window.open("", "_blank");
+        if (!w) return;
+        w.document.write(
+          "<html dir='rtl'><head><title>QR الكاونتر - عماد أفندي</title></head>" +
+            "<body style='text-align:center;font-family:sans-serif;padding:40px;background:#fff;color:#000;'>" +
+            "<h1 style='font-size:32px;margin-bottom:4px;'>عماد أفندي</h1>" +
+            "<p style='font-size:18px;margin-top:0;'>قهوتك على أصولها</p>" +
+            "<hr style='margin:20px 0;'/>" +
+            "<h2>امسح الكود واستلم رقمك</h2>" +
+            "<img src='" + qrSrc(tu) + "' style='width:300px;height:300px;margin:20px 0;' />" +
+            "<p style='font-size:14px;direction:ltr;'>" + tu + "</p>" +
+            "<script>onload=()=>{print();}<\/script></body></html>"
+        );
+        w.document.close();
+      });
+    }
 
     if (useSupabase() && window.supabase) {
       try {
@@ -375,7 +369,7 @@
         sb.channel(CFG.CHANNEL)
           .on("postgres_changes", { event: "*", schema: "public", table: CFG.TABLE }, () => refresh())
           .subscribe();
-        setInterval(refresh, 5000);
+        setInterval(refresh, 3000);
       } catch (e) {
         refresh();
       }

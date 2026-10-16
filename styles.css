@@ -800,8 +800,8 @@ body.is-ready::before {
 /* أيقونات فيكتور */
 .ic { width: 1.2em; height: 1.2em; flex: none; vertical-align: middle; }
 .big-ic { display: flex; justify-content: center; }
-.big-ic .ic { width: 54px; height: 54px; color: var(--gold); }
-.stars { font-size: 28px; letter-spacing: 4px; color: var(--gold); }
+.stars { display: flex; justify-content: center; align-items: center; gap: 6px; color: var(--gold); }
+.stars .ic { width: 26px; height: 26px; fill: var(--gold); stroke: var(--gold); }
 
 /* طبقة الموجات الذهبية */
 .bg-waves {

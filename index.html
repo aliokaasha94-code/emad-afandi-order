@@ -86,10 +86,10 @@
 
           <!-- صندوق التنبيه التفاعلي -->
           <div class="smart-info-box">
-            <span class="icon">🕒</span>
+            <span class="icon" data-ic="clock"></span>
             <div>
               <div class="title" id="smartInfoTitle">هنرنّلك أول ما يجهز</div>
-              <div class="desc" id="smartInfoDesc">طلبك هو التالي • بنحضّر قهوتك على مزاجك</div>
+              <div class="desc" id="smartInfoDesc">طلبك هو التالي</div>
             </div>
           </div>
         </div>
@@ -98,10 +98,10 @@
       <!-- كارت تفعيل التنبيهات مع فحص الصوت -->
       <section class="notify-card" id="notifyCard">
         <div class="notify-info">
-          <div class="notify-badge">✓</div>
+          <div class="notify-badge"><span data-ic="check"></span></div>
           <div>
             <div class="notify-text-title">التنبيه مفّعل</div>
-            <div class="notify-text-sub">رح يوصلك تنبيه حتى لو قفلت الشاشة</div>
+            <div class="notify-text-sub">هيوصلك تنبيه حتى لو قفلت الشاشة</div>
           </div>
         </div>
         <button class="test-sound-btn" id="bellBtn"><span data-ic="volume"></span>جرّب الصوت</button>
@@ -109,10 +109,10 @@
 
       <!-- حقل اسم العميل الاختياري -->
       <div class="name-input-wrap">
-        <input class="name-input" id="nameInput" placeholder="✏️ اسمك (اختياري) للباريستا" />
+        <input class="name-input" id="nameInput" placeholder="اسمك (اختياري) للباريستا" />
       </div>
 
-      <p class="hint" style="text-align:center;">اقعد براحتك.. أول ما يخلص فنجانك هيرن جوالك ويهتز</p>
+      <p class="hint" style="text-align:center;">اقعد براحتك.. أول ما يخلص فنجانك هيرن موبايلك ويهتز</p>
     </div>
 
     <!-- 3. شاشة الجاهزية الملكية المتوهجة (طلبك جاهز!) -->
@@ -129,7 +129,7 @@
       <!-- كارت الاستلام الأسود مع الختم الذهبي -->
       <div class="ready-ticket">
         <div class="watermark-stamp">جاهز</div>
-        <div style="font-size:14px; font-weight:700; color:var(--gold-soft);">ورّي هالرقم للكاشير</div>
+        <div style="font-size:14px; font-weight:700; color:var(--gold-soft);">ورّي الرقم ده للكاشير</div>
         <div class="order-no" style="font-size:clamp(4.2rem,22vw,6rem); margin-top:4px;">
           <span class="hash">#</span><span id="readyOrderNo">–</span>
         </div>
@@ -149,9 +149,11 @@
 
     <!-- 4. كارت الشكر والتقييم بعد الاستلام -->
     <section class="card review-card" id="doneCard" hidden>
-      <div class="stars">★★★★★</div>
+      <div class="stars">
+        <span data-ic="star"></span><span data-ic="star"></span><span data-ic="star"></span><span data-ic="star"></span><span data-ic="star"></span>
+      </div>
       <h2 style="font-size:24px; font-weight:900; margin-top:8px; color:var(--cream);">يومك جميل مع عماد أفندي</h2>
-      <p class="hint">بالهنا والشفا.. قهوتك دايماً على مزاجك. رأيك يفرق معانا جداً:</p>
+      <p class="hint">بالهنا والشفا.. رأيك يفرق معانا جداً:</p>
       <div style="height:8px"></div>
       <a id="mapsLink" href="https://www.google.com/maps/search/?api=1&query=عماد+أفندي+كفر+الشيخ" target="_blank" rel="noopener">
         <span data-ic="star"></span>قيّمنا على جوجل ريفيو
@@ -163,8 +165,8 @@
   <div class="modal-overlay" id="howModal" hidden>
     <div class="modal-content">
       <div class="modal-header">
-        <span style="font-weight:800; font-size:14px; color:var(--gold);">عماد أفندي ☕</span>
-        <button class="modal-close" id="howClose">✕</button>
+        <span style="font-weight:800; font-size:14px; color:var(--gold);">عماد أفندي</span>
+        <button class="modal-close" id="howClose"><span data-ic="close"></span></button>
       </div>
 
       <div class="modal-title font-head">إزاي بيشتغل المنادي الذكي؟</div>
@@ -179,12 +181,12 @@
         <div class="how-card-box">
           <div class="how-card-badge"><span data-ic="coffee"></span></div>
           <div class="how-card-title">2. بنحضّر طلبك</div>
-          <div class="how-card-desc">قهوتك بتتعمل على مزاجك</div>
+          <div class="how-card-desc">طلبك بيتحضّر بعناية</div>
         </div>
 
         <div class="how-card-box">
           <div class="how-card-badge" style="background:var(--gold); color:#000;"><span data-ic="bell"></span></div>
-          <div class="how-card-title">3. جوالك هيرن</div>
+          <div class="how-card-title">3. موبايلك هيرن</div>
           <div class="how-card-desc">رنين واهتزاز أول ما يجهز</div>
         </div>
       </div>

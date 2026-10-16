@@ -3,13 +3,9 @@
    كل الإعدادات في مكان واحد. عدّل هنا بس.
    ============================================================ */
 window.EMAD_CONFIG = {
-  // --- الربط اللحظي (اختياري) ---
-  // لو سيبتهم فاضيين، المشروع هيشتغل محلياً فوراً
-  // (BroadcastChannel + localStorage + Polling) بين التابات على نفس الجهاز.
-  // لو عايز الربط يشتغل بين أجهزة مختلفة (موبايل العميل + تابلت الكاشير)،
-  // اعمل مشروع Supabase مجاني وحط المفتاحين هنا:
-  SUPABASE_URL: "",
-  SUPABASE_ANON_KEY: "",
+  // --- الربط اللحظي ---
+  SUPABASE_URL: "https://cuppprqsttafhzulnyyq.supabase.co",
+  SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1cHBwcnFzdHRhZmh6dWxueXlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MDA5MjQsImV4cCI6MjA5NTA3NjkyNH0.pcoLbQwqmwYUyu1qmy0PFZHJZddKk1zQQD3KoTsBHIY",
 
   TABLE: "orders",          // اسم الجدول في Supabase
   CHANNEL: "order-status",  // اسم قناة الـ Realtime
