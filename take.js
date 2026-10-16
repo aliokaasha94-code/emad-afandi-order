@@ -54,10 +54,21 @@
 
   async function createOrder(num, sb) {
     // 1. مزامنة سحابية مع Supabase (لتظهر فوراً على شاشة الكاشير/الآيباد عبر الإنترنت)
+    const nowIso = new Date().toISOString();
+    const nowMs = Date.now();
     if (sb) {
       try {
         const { error } = await sb.from(CFG.TABLE).upsert(
-          { order_number: num, status: "preparing", updated_at: new Date().toISOString() },
+          {
+            order_number: num,
+            status: "preparing",
+            on_way: false,
+            name: "",
+            phone: "",
+            items: "",
+            created_at: nowIso,
+            updated_at: nowIso
+          },
           { onConflict: "order_number" }
         );
         if (error) console.warn("Supabase upsert error:", error);
@@ -68,7 +79,13 @@
 
     // 2. حفظ محلي واحتياطي فوري
     const s = readStore();
-    s[num] = { status: "preparing", createdAt: Date.now(), updatedAt: Date.now() };
+    s[num] = {
+      status: "preparing",
+      on_way: false,
+      name: "",
+      createdAt: nowMs,
+      updatedAt: nowMs
+    };
     try {
       localStorage.setItem(CFG.STORE_KEY, JSON.stringify(s));
     } catch {}

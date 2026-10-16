@@ -118,33 +118,74 @@
     }
   }
 
+  /* ---------- تنبيهات الكيباد والأوردرات المكررة ---------- */
+  function showPadAlert(msg) {
+    const el = $("padAlert");
+    if (!el) return;
+    el.textContent = msg;
+    el.style.display = "block";
+    const pv = $("padView");
+    if (pv) {
+      pv.classList.add("shake-error");
+      setTimeout(() => pv.classList.remove("shake-error"), 600);
+    }
+    setTimeout(() => { el.style.display = "none"; }, 3500);
+  }
+
   /* ---------- إدارة الطلبات ---------- */
   async function addOrder(order) {
     order = String(order).trim();
     if (!order) return;
 
+    // 1. منع تكرار نفس الرقم لو الأوردر لسه نشط ومعملش تم التسليم
+    if (cache[order] && cache[order].status !== "done") {
+      showPadAlert("⚠️ الأوردر #" + order + " موجود بالفعل في الطلبات النشطة!");
+      const existing = document.querySelector('.order-card[data-order="' + order + '"]');
+      if (existing) {
+        existing.scrollIntoView({ behavior: "smooth", block: "center" });
+        existing.classList.add("highlight-pulse");
+        setTimeout(() => existing.classList.remove("highlight-pulse"), 1800);
+      }
+      return;
+    }
+
+    const nowIso = new Date().toISOString();
+    const nowMs = Date.now();
+
+    // 2. تصفير العداد وتحديث السحابة والمخزن المحلي من نقطة الصفر
     if (useSupabase() && sb) {
       try {
         await sb.from(CFG.TABLE).upsert(
-          { order_number: order, status: "preparing", updated_at: new Date().toISOString() },
+          {
+            order_number: order,
+            status: "preparing",
+            on_way: false,
+            name: "",
+            phone: "",
+            items: "",
+            created_at: nowIso,
+            updated_at: nowIso
+          },
           { onConflict: "order_number" }
         );
-        await refresh();
       } catch (e) {
         console.warn(e);
       }
-    } else {
-      const s = readStore();
-      s[order] = {
-        status: "preparing",
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-        on_way: false,
-      };
-      writeStore(s);
-      bcPost({ order, status: "preparing", ts: Date.now() });
-      render();
     }
+
+    const s = readStore();
+    s[order] = {
+      status: "preparing",
+      createdAt: nowMs,
+      updatedAt: nowMs,
+      on_way: false,
+      name: "",
+    };
+    writeStore(s);
+    cache[order] = s[order];
+    notifiedOnWay.delete(order);
+    bcPost({ order, status: "preparing", on_way: false, ts: nowMs });
+    await refresh();
   }
 
   async function setStatus(order, status, recall) {
@@ -162,10 +203,6 @@
       writeStore(s);
       bcPost({ order, status, ts: Date.now(), recall: !!recall });
       render();
-    }
-
-    if (status === "ready" && window.EmadSound) {
-      window.EmadSound.playPagerChime();
     }
   }
 
@@ -234,14 +271,16 @@
       const isReady = o.status === "ready";
       const isOnWay = Boolean(o.on_way);
 
-      // تنبيه صوتي للباريستا لو وصل إشعار "أنا جاي" لأول مرة
+      // صامت تماماً بدون أي صوت على شاشة الكاشير حتى لا يقطع ساوند سيستم الكافيه
       if (isOnWay && !notifiedOnWay.has(order)) {
         notifiedOnWay.add(order);
-        if (window.EmadSound) window.EmadSound.playPagerChime();
       }
 
       const card = document.createElement("div");
       card.className = "order-card" + (isReady ? " is-ready" : "");
+      card.dataset.order = order;
+
+      const orderTrackUrl = trackUrl(order);
 
       card.innerHTML =
         '<div class="num">#' + escapeHtml(order) + "</div>" +
@@ -256,17 +295,14 @@
           : '<button class="btn btn-gold" data-a="ready"><span data-ic="bell"></span>جاهز للاستلام</button>') +
         '<button class="btn btn-red" data-a="done"><span data-ic="check"></span>تم التسليم</button>' +
         "</div>" +
-        '<div style="margin-top:10px;">' +
-        '<button class="btn btn-ghost wide" data-a="show-qr"><span data-ic="ticket"></span>عرض QR</button>' +
+        '<div class="card-qr-box">' +
+        '<img class="card-qr-img" src="' + qrSrc(orderTrackUrl) + '" alt="QR #' + escapeHtml(order) + '" />' +
+        '<div class="card-qr-sub">امسح لمتابعة طلبك</div>' +
         '</div>';
 
       card.querySelector('[data-a="ready"]')?.addEventListener("click", () => setStatus(order, "ready"));
       card.querySelector('[data-a="recall"]')?.addEventListener("click", () => setStatus(order, "ready", true));
       card.querySelector('[data-a="done"]').addEventListener("click", () => setStatus(order, "done"));
-
-      card.querySelector('[data-a="show-qr"]').addEventListener("click", () => {
-        showCounterQrModal(order, trackUrl(order));
-      });
 
       ordersEl.appendChild(card);
     });

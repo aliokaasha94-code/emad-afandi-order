@@ -44,6 +44,7 @@
         </div>
         <div style="height:10px"></div>
         <div class="order-no" style="font-size:clamp(2.2rem,10vw,3rem);" id="padView">–</div>
+        <div id="padAlert" class="pad-alert" style="display:none;"></div>
         <div class="numpad" id="numpad">
           <button data-d="1">1</button><button data-d="2">2</button><button data-d="3">3</button>
           <button data-d="4">4</button><button data-d="5">5</button><button data-d="6">6</button>
@@ -51,16 +52,13 @@
           <button data-d="C">مسح</button><button data-d="0">0</button><button data-d="B">⌫</button>
           <button class="btn btn-gold wide" id="addBtn" style="margin-top:4px;"><span data-ic="plus"></span>إضافة</button>
         </div>
-              </section>
+      </section>
 
       <section class="orders" id="orders"></section>
 
       <section class="card" style="text-align:center;">
-        <div class="topbar" style="justify-content:center;">
-          <span class="font-head" style="font-weight:900; font-size:20px;">QR الكاونتر الثابت</span>
-        </div>
-        <p class="hint">امسح الكود واستلم رقمك</p>
-        <img class="qr" id="takeQr" alt="QR الكاونتر" style="margin:14px auto;" />
+        <p class="status-text warm" style="font-weight:800; font-size:18px; margin:0 0 6px;">امسح الكود واستلم رقمك</p>
+        <img class="qr" id="takeQr" alt="QR الكاونتر" style="margin:10px auto; width:220px; height:220px;" />
       </section>
     </div>
   </main>

@@ -24,10 +24,33 @@
   const howOk = $("howOk");
   const howClose = $("howClose");
 
+  const muteBtn = $("muteBtn");
+  const muteText = $("muteText");
+
   let bellOn = true;
+  let alertSilenced = false;
   let currentStatus = "preparing";
   let sb = null;
   let bc = null;
+  let wakeLockObj = null;
+
+  /* ---------- منع إغلاق الشاشة (Screen Wake Lock) ---------- */
+  async function requestWakeLock() {
+    try {
+      if ("wakeLock" in navigator && !wakeLockObj) {
+        wakeLockObj = await navigator.wakeLock.request("screen");
+        wakeLockObj.addEventListener("release", () => {
+          wakeLockObj = null;
+        });
+      }
+    } catch (e) {}
+  }
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && currentStatus !== "done") {
+      requestWakeLock();
+    }
+  });
 
   /* ---------- التخزين المحلي والـ BroadcastChannel ---------- */
   function readStore() {
@@ -128,15 +151,43 @@
 
   /* ---------- التنبيه بالرنين والاهتزاز ---------- */
   function ringReady() {
+    if (alertSilenced) return;
     if (window.EmadSound) {
       window.EmadSound.startChimeLoop(CFG.CHIME_EVERY_MS || 3500);
     }
     document.title = "طلبك جاهز! #" + orderNo + " - عماد أفندي";
+    requestWakeLock();
+
+    // إشعار نظام مدمج (Native System Notification)
+    if ("Notification" in window && Notification.permission === "granted") {
+      try {
+        new Notification("طلبك جاهز! #" + orderNo + " - عماد أفندي", {
+          body: "تفضّل استلمه من الكاونتر.. بالهنا والشفا",
+          icon: "assets/logo.png",
+          badge: "assets/logo.png",
+          vibrate: [400, 150, 400, 150, 700],
+          tag: "emad-order-" + orderNo,
+        });
+      } catch (e) {}
+    }
   }
 
   /* ---------- عرض الحالات المختلفة (UI States) ---------- */
   function render(status, meta) {
     currentStatus = status;
+
+    // إذا ضغط العميل "أنا جاي" سابقاً أو من السحابة، اكتم الصوت نهائياً
+    if (meta && Boolean(meta.on_way)) {
+      alertSilenced = true;
+      if (window.EmadSound) window.EmadSound.stopChimeLoop();
+      if (onWayBtn) {
+        onWayBtn.disabled = true;
+        onWayBtn.style.background = "rgba(212, 175, 55, 0.25)";
+        onWayBtn.style.color = "var(--gold-bright)";
+        onWayText.innerHTML = '<span data-ic="check"></span>بلّغنا الكاشير إنك في الطريق';
+        if (window.EmadIcons) window.EmadIcons.hydrate(onWayBtn);
+      }
+    }
 
     // 1. حالة تم الاستلام (Done)
     if (status === "done" || status === "picked_up") {
@@ -156,7 +207,12 @@
       trackWrapper.hidden = true;
       readyWrapper.hidden = false;
       document.body.classList.add("is-ready");
-      ringReady();
+      requestWakeLock();
+      if (!alertSilenced && !(meta && meta.on_way)) {
+        ringReady();
+      } else {
+        if (window.EmadSound) window.EmadSound.stopChimeLoop();
+      }
       return;
     }
 
@@ -165,6 +221,7 @@
     readyWrapper.hidden = true;
     trackWrapper.hidden = false;
     document.title = "طلبك قيد التحضير #" + orderNo + " - عماد أفندي";
+    requestWakeLock();
 
     if (meta && meta.items && $("orderItemsText")) {
       $("orderItemsText").textContent = meta.items;
@@ -176,7 +233,9 @@
 
   /* ---------- إرسال إشارة "أنا جاي" للكاشير ---------- */
   async function sendOnWay() {
+    alertSilenced = true;
     if (window.EmadSound) window.EmadSound.stopChimeLoop();
+
     onWayText.innerHTML = '<span data-ic="check"></span>بلّغنا الكاشير إنك في الطريق';
     if (window.EmadIcons) window.EmadIcons.hydrate(onWayBtn);
     onWayBtn.disabled = true;
@@ -247,6 +306,16 @@
 
   if (receivedBtn) {
     receivedBtn.addEventListener("click", () => setStatusDone(orderNo));
+  }
+
+  if (muteBtn) {
+    muteBtn.addEventListener("click", () => {
+      alertSilenced = true;
+      if (window.EmadSound) window.EmadSound.stopChimeLoop();
+      if (muteText) muteText.textContent = "تم إيقاف الرنين";
+      muteBtn.style.opacity = "0.5";
+      muteBtn.disabled = true;
+    });
   }
 
   if (bellBtn) {

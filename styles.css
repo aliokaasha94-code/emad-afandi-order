@@ -856,3 +856,80 @@ body.is-ready::before {
   padding: 12px 26px;
   border-radius: 99px;
 }
+
+/* صندوق الـ QR المباشر في كارت كل أوردر بالكاشير */
+.card-qr-box {
+  margin-top: 14px;
+  padding: 12px 10px 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px dashed rgba(212, 175, 55, 0.35);
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.card-qr-img {
+  width: 140px;
+  height: 140px;
+  background: #ffffff;
+  padding: 6px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  display: block;
+}
+.card-qr-sub {
+  font-size: 12px;
+  color: var(--gold-soft);
+  font-weight: 700;
+}
+
+/* تنبيه تكرار الأوردر واهتزاز الخطأ */
+.pad-alert {
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: 12px;
+  padding: 8px 14px;
+  font-size: 13.5px;
+  font-weight: 700;
+  margin: 6px 0 10px;
+  animation: fadeIn 0.25s ease;
+}
+.shake-error {
+  animation: shakeErr 0.45s ease-in-out;
+  color: var(--red) !important;
+}
+@keyframes shakeErr {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-8px); }
+  40%, 80% { transform: translateX(8px); }
+}
+.highlight-pulse {
+  animation: highPulse 1.8s ease-out;
+}
+@keyframes highPulse {
+  0% { box-shadow: 0 0 0 4px var(--gold-bright), 0 0 40px var(--gold-glow); transform: scale(1.02); }
+  100% { box-shadow: 0 0 0 0 transparent; transform: scale(1); }
+}
+
+/* زر كتم الصوت في شاشة الجاهزية للعميل */
+.mute-sound-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--cream);
+  border-radius: 99px;
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+.mute-sound-btn:active {
+  transform: scale(0.95);
+}
