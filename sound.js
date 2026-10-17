@@ -231,7 +231,7 @@
   }
 
   function isUnlocked() {
-    return unlocked || (ctx && ctx.state === "running");
+    return unlocked;
   }
 
   window.EmadSound = {

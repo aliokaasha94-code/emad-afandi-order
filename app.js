@@ -45,21 +45,24 @@
   }
   registerServiceWorker();
 
+  let readyNotifiedOrder = null;
+
   /* ---------- إطلاق إشعار النظام بصوت واهتزاز قناة النوتيفيكيشن (STREAM_NOTIFICATION) ---------- */
-  async function triggerSystemNotification() {
+  async function triggerSystemNotification(force) {
     if (!("Notification" in window)) return;
     if (Notification.permission !== "granted") return;
+    if (!force && readyNotifiedOrder === orderNo) return; // منع تكرار الإشعار نهائياً
+    readyNotifiedOrder = orderNo;
 
     const title = "عماد أفندي: طلب رقم " + orderNo + " جاهز";
     const body = "طلبك جاهز للاستلام الآن من الكاونتر";
 
-    const uniqueTag = "emad-ready-" + orderNo + "-" + Date.now();
     const options = {
       body,
       icon: "assets/logo.png",
       badge: "assets/logo.png",
       vibrate: [600, 250, 600, 250, 1000],
-      tag: uniqueTag,
+      tag: "emad-ready-" + orderNo, // كارت موحد يمنع تراكم إشعارات متعددة
       renotify: true, // يضمن رنين واهتزاز الموبايل في كل نداء
       silent: false, // قناة النوتيفيكيشن (STREAM_NOTIFICATION)
       data: {
@@ -74,15 +77,8 @@
         const reg = swReg || (await navigator.serviceWorker.ready);
         if (reg && reg.showNotification) {
           await reg.showNotification(title, options);
+          return;
         }
-        if (navigator.serviceWorker.controller) {
-          navigator.serviceWorker.controller.postMessage({
-            type: "SHOW_NOTIFICATION",
-            title,
-            options
-          });
-        }
-        return;
       }
     } catch (e) {
       console.warn("SW showNotification error:", e);
@@ -158,7 +154,7 @@
             if (m.status) {
               if (m.recall && currentStatus === "ready") {
                 alertSilenced = false;
-                ringReady();
+                ringReady(true);
               } else {
                 render(m.status, m);
               }
@@ -236,11 +232,11 @@
   }
 
   /* ---------- التنبيه بالرنين والاهتزاز ونوتيفيكيشن النظام ---------- */
-  function ringReady() {
+  function ringReady(isRecall) {
     if (alertSilenced) return;
 
-    // 1. إطلاق إشعار النظام المباشر بصوت واهتزاز قناة النوتيفيكيشن (STREAM_NOTIFICATION)
-    triggerSystemNotification();
+    // 1. إطلاق إشعار النظام المباشر بصوت واهتزاز قناة النوتيفيكيشن (مرة واحدة فقط)
+    triggerSystemNotification(!!isRecall);
 
     // 2. تشغيل نغمة الويب الداخلية المتكررة
     if (window.EmadSound) {
@@ -249,10 +245,9 @@
     document.title = "طلبك جاهز! #" + orderNo + " - عماد أفندي";
     requestWakeLock();
 
-    // في حال كان الصوت معلقاً، أول لمسة للشاشة تشغل النوتيفيكيشن والصوت فوراً
+    // في حال كان الصوت معلقاً، أول لمسة للشاشة تشغل الصوت فوراً
     const kickstartOnTouch = () => {
       if (!alertSilenced) {
-        triggerSystemNotification();
         if (window.EmadSound) {
           window.EmadSound.unlockAudio();
           window.EmadSound.playPagerChime();
@@ -418,13 +413,15 @@
     const badge = $("notifyBadge");
     if (!card) return;
 
-    const isGranted = "Notification" in window && Notification.permission === "granted";
+    const isAudioUnlocked = window.EmadSound && window.EmadSound.isUnlocked();
+    const isNotifyGranted = "Notification" in window && Notification.permission === "granted";
+    const isFullyArmed = isAudioUnlocked && isNotifyGranted;
 
-    if (isGranted) {
+    if (isFullyArmed) {
       card.classList.remove("needs-permission");
       card.classList.add("is-armed");
-      if (title) title.textContent = "جرس المنادي مفعّل";
-      if (sub) sub.textContent = "موبايلك هيرن ويهتز بعد ما أوردرك يكون جاهز";
+      if (title) title.textContent = "جرس المنادي مفعّل ومسلّح ✓";
+      if (sub) sub.textContent = "موبايلك هيرن ويهتز تلقائياً أول ما طلبك يجهز";
       if (badge) {
         badge.innerHTML = '<span data-ic="bell"></span>';
         if (window.EmadIcons) window.EmadIcons.hydrate(badge);
@@ -432,8 +429,8 @@
     } else {
       card.classList.add("needs-permission");
       card.classList.remove("is-armed");
-      if (title) title.textContent = "اضغط لتفعيل جرس الإشعارات 🔔";
-      if (sub) sub.textContent = "اضغط «سماح» ليرن موبايلك بنغمة الإشعارات أول ما يجهز";
+      if (title) title.textContent = "اضغط لتفعيل جرس المنادي 🔔";
+      if (sub) sub.textContent = "اضغط هنا لضمان رنين الموبايل واهتزازه فور جاهزية طلبك";
       if (badge) {
         badge.innerHTML = '<span data-ic="bell"></span>';
         if (window.EmadIcons) window.EmadIcons.hydrate(badge);
@@ -447,19 +444,12 @@
     }
     if ("Notification" in window) {
       try {
-        const perm = await Notification.requestPermission();
-        updateArmedUI();
-        if (perm === "granted" && showConfirm) {
-          if (window.EmadSound) {
-            window.EmadSound.playConfirmBeep();
-          }
-          // نكتفي بنغمة التأكيد والتحديث البصري ولا نرسل إشعار نظام مسبقاً حتى لا يعتبره كروم سبام
-        }
-      } catch (err) {
-        updateArmedUI();
-      }
-    } else {
-      updateArmedUI();
+        await Notification.requestPermission();
+      } catch (err) {}
+    }
+    updateArmedUI();
+    if (showConfirm && window.EmadSound) {
+      window.EmadSound.playConfirmBeep();
     }
   }
 
@@ -467,15 +457,12 @@
     if (window.EmadSound) {
       window.EmadSound.unlockAudio();
     }
-    if ("Notification" in window && Notification.permission === "default") {
-      requestNotificationAccess(false);
-    }
     updateArmedUI();
   }
 
-  // فك حظر الصوت والنوتيفيكيشن فوراً مع أول لمسة للموبايل في أي مكان بالصفحة
+  // فك حظر الصوت والنوتيفيكيشن فوراً مع أي لمسة للموبايل في أي مكان بالصفحة
   ["touchstart", "touchend", "pointerdown", "click"].forEach((evt) => {
-    window.addEventListener(evt, armAudioGlobally, { passive: true, once: true });
+    window.addEventListener(evt, armAudioGlobally, { passive: true });
   });
 
   if ($("notifyCard")) {
