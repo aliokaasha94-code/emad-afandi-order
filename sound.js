@@ -17,6 +17,11 @@
   const chimeAudio = new Audio("assets/chime.wav");
   chimeAudio.preload = "auto";
 
+  // مسار صوتي صامت مستمر في الخلفية لإبقاء قناة الصوت في نظام أندرويد نشطة دائماً
+  const silenceAudio = new Audio("assets/silence.wav");
+  silenceAudio.preload = "auto";
+  silenceAudio.loop = true;
+
   // النغمات الخماسية الفاخرة للقهوة: E5 ثم B5 مع نغمة كريستالية
   const TONE_1 = 659.25; // E5
   const TONE_2 = 987.77; // B5
@@ -146,6 +151,16 @@
         chimeAudio.currentTime = 0;
       } catch (e) {}
     }
+    if (silenceAudio) {
+      try {
+        silenceAudio.pause();
+      } catch (e) {}
+    }
+    if ("mediaSession" in navigator) {
+      try {
+        navigator.mediaSession.playbackState = "none";
+      } catch (e) {}
+    }
     // إيقاف أي اهتزاز مستمر
     if (typeof navigator !== "undefined" && navigator.vibrate) {
       try {
@@ -162,7 +177,29 @@
       c.resume().catch(() => {});
     }
 
-    // تشغيل مذبذب صامت بتردد 20Hz لإبقاء قناة الصوت مفتوحة ومستمرة دون تعليق
+    // 1. تشغيل مسار صامت دائم يحافظ على اتصال المتصفح بالصوت في نظام أندرويد
+    if (silenceAudio) {
+      silenceAudio.volume = 0.01;
+      const p = silenceAudio.play();
+      if (p !== undefined) {
+        p.catch(() => {});
+      }
+    }
+
+    // 2. MediaSession لإخبار نظام الهاتف باستمرار نشاط الصوت
+    if ("mediaSession" in navigator) {
+      try {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: "عماد أفندي - متابعة الطلب",
+          artist: "جرس المنادي",
+          album: "عماد أفندي",
+          artwork: [{ src: "assets/logo.png", sizes: "512x512", type: "image/png" }]
+        });
+        navigator.mediaSession.playbackState = "playing";
+      } catch (e) {}
+    }
+
+    // 3. تشغيل مذبذب صامت لطبقة Web Audio API
     if (c && !keepAliveNode) {
       try {
         const osc = c.createOscillator();
@@ -174,18 +211,6 @@
         osc.start();
         keepAliveNode = osc;
       } catch (e) {}
-    }
-
-    // تجهيز عنصر الـ HTML5 Audio بلمسة أولية
-    if (chimeAudio) {
-      chimeAudio.volume = 1.0;
-      const p = chimeAudio.play();
-      if (p !== undefined) {
-        p.then(() => {
-          chimeAudio.pause();
-          chimeAudio.currentTime = 0;
-        }).catch(() => {});
-      }
     }
 
     return true;

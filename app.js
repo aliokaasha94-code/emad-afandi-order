@@ -53,13 +53,15 @@
     const title = "عماد أفندي: طلب رقم " + orderNo + " جاهز";
     const body = "طلبك جاهز للاستلام الآن من الكاونتر";
 
+    const uniqueTag = "emad-ready-" + orderNo + "-" + Date.now();
     const options = {
       body,
       icon: "assets/logo.png",
       badge: "assets/logo.png",
-      vibrate: [500, 200, 500],
-      tag: "emad-order-" + orderNo,
-      silent: false, // يضمن تشغيل صوت نوتيفيكيشن الموبايل (STREAM_NOTIFICATION)
+      vibrate: [600, 250, 600, 250, 1000],
+      tag: uniqueTag,
+      renotify: true, // يضمن رنين واهتزاز الموبايل في كل نداء
+      silent: false, // قناة النوتيفيكيشن (STREAM_NOTIFICATION)
       data: {
         url: location.href,
         order: orderNo
@@ -72,8 +74,15 @@
         const reg = swReg || (await navigator.serviceWorker.ready);
         if (reg && reg.showNotification) {
           await reg.showNotification(title, options);
-          return;
         }
+        if (navigator.serviceWorker.controller) {
+          navigator.serviceWorker.controller.postMessage({
+            type: "SHOW_NOTIFICATION",
+            title,
+            options
+          });
+        }
+        return;
       }
     } catch (e) {
       console.warn("SW showNotification error:", e);
