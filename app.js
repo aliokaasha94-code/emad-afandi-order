@@ -24,9 +24,6 @@
   const howOk = $("howOk");
   const howClose = $("howClose");
 
-  const muteBtn = $("muteBtn");
-  const muteText = $("muteText");
-
   let bellOn = true;
   let alertSilenced = false;
   let currentStatus = "preparing";
@@ -150,6 +147,7 @@
   }
 
   /* ---------- التنبيه بالرنين والاهتزاز ---------- */
+  /* ---------- التنبيه بالرنين والاهتزاز ---------- */
   function ringReady() {
     if (alertSilenced) return;
     if (window.EmadSound) {
@@ -157,6 +155,17 @@
     }
     document.title = "طلبك جاهز! #" + orderNo + " - عماد أفندي";
     requestWakeLock();
+
+    // لو كان الصوت معلقاً بسبب قيود المتصفح لعدم وجود لمس مسبق، بمجرد أي لمسة على الشاشة يشتغل فوراً
+    const kickstartOnTouch = () => {
+      if (window.EmadSound && !alertSilenced) {
+        window.EmadSound.unlockAudio();
+        window.EmadSound.startChimeLoop(CFG.CHIME_EVERY_MS || 3500);
+      }
+    };
+    window.addEventListener("touchstart", kickstartOnTouch, { once: true, passive: true });
+    window.addEventListener("pointerdown", kickstartOnTouch, { once: true, passive: true });
+    window.addEventListener("click", kickstartOnTouch, { once: true, passive: true });
 
     // إشعار نظام مدمج (Native System Notification)
     if ("Notification" in window && Notification.permission === "granted") {
@@ -175,19 +184,6 @@
   /* ---------- عرض الحالات المختلفة (UI States) ---------- */
   function render(status, meta) {
     currentStatus = status;
-
-    // إذا ضغط العميل "أنا جاي" سابقاً أو من السحابة، اكتم الصوت نهائياً
-    if (meta && Boolean(meta.on_way)) {
-      alertSilenced = true;
-      if (window.EmadSound) window.EmadSound.stopChimeLoop();
-      if (onWayBtn) {
-        onWayBtn.disabled = true;
-        onWayBtn.style.background = "rgba(212, 175, 55, 0.25)";
-        onWayBtn.style.color = "var(--gold-bright)";
-        onWayText.innerHTML = '<span data-ic="check"></span>بلّغنا الكاشير إنك في الطريق';
-        if (window.EmadIcons) window.EmadIcons.hydrate(onWayBtn);
-      }
-    }
 
     // 1. حالة تم الاستلام (Done)
     if (status === "done" || status === "picked_up") {
@@ -208,10 +204,30 @@
       readyWrapper.hidden = false;
       document.body.classList.add("is-ready");
       requestWakeLock();
-      if (!alertSilenced && !(meta && meta.on_way)) {
-        ringReady();
-      } else {
+
+      const isOnWay = meta && Boolean(meta.on_way);
+      if (isOnWay) {
+        // العميل ضغط "أنا جاي" سابقاً: اكتم الصوت وعطّل الزر
+        alertSilenced = true;
         if (window.EmadSound) window.EmadSound.stopChimeLoop();
+        if (onWayBtn) {
+          onWayBtn.disabled = true;
+          onWayBtn.style.background = "rgba(212, 175, 55, 0.25)";
+          onWayBtn.style.color = "var(--gold-bright)";
+          onWayText.innerHTML = '<span data-ic="check"></span>بلّغنا الكاشير إنك في الطريق';
+          if (window.EmadIcons) window.EmadIcons.hydrate(onWayBtn);
+        }
+      } else {
+        // جاهز جديد، أو الكاشير ضغط "إعادة النداء": فك الكتم واشحن الزر ورن مجدداً!
+        alertSilenced = false;
+        if (onWayBtn) {
+          onWayBtn.disabled = false;
+          onWayBtn.style.background = "";
+          onWayBtn.style.color = "";
+          onWayText.innerHTML = '<span data-ic="walk"></span>أنا جاي أستلم';
+          if (window.EmadIcons) window.EmadIcons.hydrate(onWayBtn);
+        }
+        ringReady();
       }
       return;
     }
@@ -308,24 +324,51 @@
     receivedBtn.addEventListener("click", () => setStatusDone(orderNo));
   }
 
-  if (muteBtn) {
-    muteBtn.addEventListener("click", () => {
-      alertSilenced = true;
-      if (window.EmadSound) window.EmadSound.stopChimeLoop();
-      if (muteText) muteText.textContent = "تم إيقاف الرنين";
-      muteBtn.style.opacity = "0.5";
-      muteBtn.disabled = true;
-    });
+  /* ---------- تفعيل الصوت والتنبيهات (Audio Arming & Unlock) ---------- */
+  function updateArmedUI() {
+    const card = $("notifyCard");
+    const title = $("notifyTitle");
+    const sub = $("notifySub");
+    const badge = $("notifyBadge");
+    const btnText = $("bellBtnText");
+    if (card) card.classList.add("is-armed");
+    if (title) title.textContent = "جرس المنادي مفعّل ✓";
+    if (sub) sub.textContent = "موبايلك هيرن ويهتز بقوة أول ما قهوتك تجهز";
+    if (badge) {
+      badge.innerHTML = '<span data-ic="check"></span>';
+      if (window.EmadIcons) window.EmadIcons.hydrate(badge);
+    }
+    if (btnText) btnText.textContent = "مفعّل ✓";
+  }
+
+  function armAudioGlobally() {
+    if (window.EmadSound) {
+      window.EmadSound.unlockAudio();
+    }
+    updateArmedUI();
+  }
+
+  // فك حظر الصوت فوراً مع أول لمسة للموبايل في أي مكان بالصفحة
+  ["touchstart", "touchend", "pointerdown", "click"].forEach((evt) => {
+    window.addEventListener(evt, armAudioGlobally, { passive: true, once: true });
+  });
+
+  function handleArmBtnClick(e) {
+    if (e) e.stopPropagation();
+    if (window.EmadSound) {
+      window.EmadSound.playConfirmBeep();
+    }
+    if ("Notification" in window) {
+      try { Notification.requestPermission(); } catch (err) {}
+    }
+    updateArmedUI();
   }
 
   if (bellBtn) {
-    bellBtn.addEventListener("click", () => {
-      if (window.EmadSound) {
-        window.EmadSound.unlockAudio();
-        window.EmadSound.playPagerChime();
-        if (navigator.vibrate) navigator.vibrate([300, 150, 300]);
-      }
-    });
+    bellBtn.addEventListener("click", handleArmBtnClick);
+  }
+  if ($("notifyCard")) {
+    $("notifyCard").addEventListener("click", handleArmBtnClick);
   }
 
   if (nameInput) {
@@ -355,12 +398,11 @@
         localStorage.setItem("emad_how_v3", "1");
       } catch (e) {}
 
-      // فك حظر الصوت في متصفحات الموبايل فوراً عند ضغطة الزر
+      // فك حظر الصوت وتأكيده فوراً عند ضغطة الزر
       if (window.EmadSound) {
-        window.EmadSound.unlockAudio();
-        window.EmadSound.playPagerChime();
-        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+        window.EmadSound.playConfirmBeep();
       }
+      updateArmedUI();
 
       // طلب إذن التنبيهات
       if ("Notification" in window) {

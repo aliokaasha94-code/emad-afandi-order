@@ -147,42 +147,36 @@
       <!-- كارت تفعيل التنبيهات مع فحص الصوت -->
       <section class="notify-card" id="notifyCard">
         <div class="notify-info">
-          <div class="notify-badge"><span data-ic="check"></span></div>
+          <div class="notify-badge" id="notifyBadge"><span data-ic="bell"></span></div>
           <div>
-            <div class="notify-text-title">التنبيه مفّعل</div>
-            <div class="notify-text-sub">هيوصلك تنبيه حتى لو قفلت الشاشة</div>
+            <div class="notify-text-title" id="notifyTitle">تفعيل جرس المنادي</div>
+            <div class="notify-text-sub" id="notifySub">اضغط لتأكيد رنين واهتزاز الفون أول ما طلبك يجهز</div>
           </div>
         </div>
-        <button class="test-sound-btn" id="bellBtn"><span data-ic="volume"></span>جرّب الصوت</button>
+        <button class="test-sound-btn" id="bellBtn"><span data-ic="volume"></span><span id="bellBtnText">تفعيل الرنين</span></button>
       </section>
 
       <!-- حقل اسم العميل الاختياري -->
       <div class="name-input-wrap">
-        <input class="name-input" id="nameInput" placeholder="اسمك (اختياري) للباريستا" />
+        <input class="name-input" id="nameInput" placeholder="اسمك (اختياري)" />
       </div>
 
       <p class="hint" style="text-align:center;">اقعد براحتك.. أول ما يخلص فنجانك هيرن موبايلك ويهتز</p>
     </div>
 
     <!-- 3. شاشة الجاهزية الملكية المتوهجة (طلبك جاهز!) -->
-    <div id="readyWrapper" hidden style="width:100%; display:flex; flex-direction:column; align-items:center; text-align:center; gap:16px;">
-      
-      <!-- جرس الجاهزية الذهبي المتوهج -->
-      <div class="ready-bell-box">
-        <span data-ic="bell" style="width:42px; height:42px;"></span>
-      </div>
-
+    <div id="readyWrapper" hidden style="width:100%; display:flex; flex-direction:column; align-items:center; text-align:center;">
       <h1 class="ready-title font-head">طلبك جاهز!</h1>
       <p class="ready-sub">تفضّل استلمه من الكاونتر.. بالهنا والشفا</p>
 
       <!-- كارت الاستلام الأسود مع الختم الذهبي -->
       <div class="ready-ticket">
         <div class="watermark-stamp">جاهز</div>
-        <div style="font-size:14px; font-weight:700; color:var(--gold-soft);">ورّي الرقم ده للكاشير</div>
-        <div class="order-no" style="font-size:clamp(4.2rem,22vw,6rem); margin-top:4px;">
+        <div class="ready-ticket-hint">ورّي الرقم ده للكاشير</div>
+        <div class="order-no ready-num-display">
           <span class="hash">#</span><span id="readyOrderNo">–</span>
         </div>
-        <p class="hint" id="readyItemsDesc" style="margin-top:6px;"></p>
+        <p class="hint" id="readyItemsDesc" style="margin-top:4px; margin-bottom:0;"></p>
       </div>
 
       <!-- زر "أنا جاي" الفاخر -->
@@ -191,13 +185,7 @@
         <span id="onWayText">أنا جاي أستلم</span>
       </button>
 
-      <!-- زر إيقاف الرنين وكتم الصوت -->
-      <button class="mute-sound-btn" id="muteBtn">
-        <span data-ic="volume"></span>
-        <span id="muteText">إيقاف الرنين</span>
-      </button>
-
-      <button class="btn btn-green" id="receivedBtn" style="margin-top:4px;">
+      <button class="btn btn-green" id="receivedBtn">
         <span data-ic="check"></span>استلمت خلاص
       </button>
     </div>

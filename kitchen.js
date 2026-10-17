@@ -189,9 +189,19 @@
   }
 
   async function setStatus(order, status, recall) {
+    if (recall || status === "ready") {
+      notifiedOnWay.delete(order);
+    }
     if (useSupabase() && sb) {
       try {
-        await sb.from(CFG.TABLE).update({ status, updated_at: new Date().toISOString() }).eq("order_number", order);
+        const updatePayload = {
+          status,
+          updated_at: new Date().toISOString()
+        };
+        if (recall || status === "ready") {
+          updatePayload.on_way = false;
+        }
+        await sb.from(CFG.TABLE).update(updatePayload).eq("order_number", order);
         await refresh();
       } catch (e) {}
     } else {
@@ -199,9 +209,12 @@
       if (s[order]) {
         s[order].status = status;
         s[order].updatedAt = Date.now();
+        if (recall || status === "ready") {
+          s[order].on_way = false;
+        }
       }
       writeStore(s);
-      bcPost({ order, status, ts: Date.now(), recall: !!recall });
+      bcPost({ order, status, on_way: false, ts: Date.now(), recall: !!recall });
       render();
     }
   }

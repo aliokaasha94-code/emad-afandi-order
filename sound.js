@@ -1,7 +1,7 @@
 /* ============================================================
    المنادي الذكي - عماد أفندي | sound.js
-   محرك صوت نقي عالي الوضوح (High-Gain Compressed Chime)
-   مع دعم كامل للاهتزاز (Vibration) وضغط الصوت الديناميكي
+   محرك صوت نقي عالي الوضوح (Dual Engine: Web Audio + HTML5 Audio)
+   مع دعم كامل للاهتزاز (Vibration) وضغط الصوت واستمرار العمل في الخلفية (Keep-Alive)
    ============================================================ */
 (function () {
   "use strict";
@@ -10,6 +10,12 @@
   let compressor = null;
   let masterGain = null;
   let loopTimer = null;
+  let keepAliveNode = null;
+  let unlocked = false;
+
+  // محرك احتياطي عبر عنصر Audio مسبق التحميل
+  const chimeAudio = new Audio("assets/chime.wav");
+  chimeAudio.preload = "auto";
 
   // النغمات الخماسية الفاخرة للقهوة: E5 ثم B5 مع نغمة كريستالية
   const TONE_1 = 659.25; // E5
@@ -32,7 +38,7 @@
 
       // مضاعف الصوت العام
       masterGain = ctx.createGain();
-      masterGain.gain.setValueAtTime(1.5, ctx.currentTime);
+      masterGain.gain.setValueAtTime(1.6, ctx.currentTime);
 
       masterGain.connect(compressor);
       compressor.connect(ctx.destination);
@@ -80,23 +86,39 @@
 
   // الرنة الفندقية العالية: دينج - دونج مع رنين واهتزاز
   function playPagerChime() {
-    const c = audio();
-    if (!c) return false;
-
-    // تشغيل الاهتزاز بقوة
+    // تشغيل الاهتزاز بقوة على الموبايل
     if (typeof navigator !== "undefined" && navigator.vibrate) {
       try {
         navigator.vibrate([400, 150, 400, 150, 700]);
       } catch (e) {}
     }
 
-    const t = c.currentTime + 0.01;
-    // النغمة الأولى (دينج)
-    tone(TONE_1, t, 1.8, 1.2);
-    tone(TONE_HIGH, t + 0.01, 1.0, 0.4);
+    // 1. تشغيل عبر Web Audio API
+    const c = audio();
+    if (c) {
+      if (c.state === "suspended") {
+        c.resume().catch(() => {});
+      }
+      if (c.state !== "suspended") {
+        const t = c.currentTime + 0.01;
+        tone(TONE_1, t, 1.8, 1.3);
+        tone(TONE_HIGH, t + 0.01, 1.0, 0.4);
+        tone(TONE_2, t + 0.36, 2.4, 1.5);
+      }
+    }
 
-    // النغمة الثانية (دونج)
-    tone(TONE_2, t + 0.36, 2.4, 1.4);
+    // 2. تشغيل متزامن أو احتياطي عبر ملف Audio المباشر لضمان الصوت في كل الظروف
+    if (chimeAudio) {
+      try {
+        chimeAudio.currentTime = 0;
+        chimeAudio.volume = 1.0;
+        const p = chimeAudio.play();
+        if (p !== undefined) {
+          p.catch(() => {});
+        }
+      } catch (e) {}
+    }
+
     return true;
   }
 
@@ -111,6 +133,12 @@
       clearInterval(loopTimer);
       loopTimer = null;
     }
+    if (chimeAudio) {
+      try {
+        chimeAudio.pause();
+        chimeAudio.currentTime = 0;
+      } catch (e) {}
+    }
     // إيقاف أي اهتزاز مستمر
     if (typeof navigator !== "undefined" && navigator.vibrate) {
       try {
@@ -119,10 +147,61 @@
     }
   }
 
-  // فك حظر الصوت في متصفحات الموبايل (Web Audio Unlock)
+  // فك حظر الصوت في متصفحات الموبايل (Web Audio Unlock + Audio Keep-Alive)
   function unlockAudio() {
+    unlocked = true;
     const c = audio();
-    return !!(c && c.state !== "closed");
+    if (c && c.state === "suspended") {
+      c.resume().catch(() => {});
+    }
+
+    // تشغيل حلقة صامتة تمنع سفاري وموبايل أندرويد من تعليق الـ AudioContext أثناء الانتظار
+    if (c && !keepAliveNode) {
+      try {
+        const buffer = c.createBuffer(1, c.sampleRate, c.sampleRate);
+        const src = c.createBufferSource();
+        src.buffer = buffer;
+        src.loop = true;
+        const silentGain = c.createGain();
+        silentGain.gain.value = 0.0001;
+        src.connect(silentGain);
+        silentGain.connect(c.destination);
+        src.start(0);
+        keepAliveNode = src;
+      } catch (e) {}
+    }
+
+    // تجهيز عنصر الـ HTML5 Audio بلمسة أولية
+    if (chimeAudio) {
+      chimeAudio.volume = 1.0;
+      const p = chimeAudio.play();
+      if (p !== undefined) {
+        p.then(() => {
+          chimeAudio.pause();
+          chimeAudio.currentTime = 0;
+        }).catch(() => {});
+      }
+    }
+
+    return true;
+  }
+
+  // نغمة تأكيد قصيرة لطيفة عند ضغط زر التفعيل
+  function playConfirmBeep() {
+    unlockAudio();
+    const c = audio();
+    if (c && c.state !== "suspended") {
+      tone(TONE_2, c.currentTime + 0.02, 0.4, 0.7);
+    }
+    if (typeof navigator !== "undefined" && navigator.vibrate) {
+      try {
+        navigator.vibrate([100, 50, 100]);
+      } catch (e) {}
+    }
+  }
+
+  function isUnlocked() {
+    return unlocked || (ctx && ctx.state === "running");
   }
 
   window.EmadSound = {
@@ -130,5 +209,7 @@
     startChimeLoop,
     stopChimeLoop,
     unlockAudio,
+    playConfirmBeep,
+    isUnlocked,
   };
 })();
