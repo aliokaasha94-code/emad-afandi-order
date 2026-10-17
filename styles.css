@@ -376,28 +376,47 @@ body::after {
   transform: scale(0.96);
 }
 
-/* خانة اسم العميل الاختياري */
+/* خانة اسم العميل الاختياري - تصميم داكن ثابت لا يتغير لونه أبداً ومقاوم للـ Autofill */
 .name-input-wrap {
   width: 100%;
 }
 .name-input {
   width: 100%;
   text-align: center;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: #14171a !important;
+  border: 1px solid rgba(212, 175, 55, 0.28);
   border-radius: 18px;
   padding: 13px 16px;
   font-size: 14px;
   font-weight: 600;
-  color: var(--cream);
+  color: var(--cream) !important;
   font-family: inherit;
-  transition: all 0.2s ease;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
-.name-input:focus {
+.name-input::placeholder {
+  color: var(--muted);
+  opacity: 0.75;
+}
+.name-input:focus,
+.name-input:active {
   outline: none;
   border-color: var(--gold);
-  background: rgba(212, 175, 55, 0.06);
-  box-shadow: 0 0 16px rgba(212, 175, 55, 0.2);
+  background: #14171a !important;
+  color: var(--cream) !important;
+  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.25);
+}
+/* منع متصفحات الموبايل وChrome من تحويل الحقل إلى اللون الأبيض نهائياً */
+.name-input:-webkit-autofill,
+.name-input:-webkit-autofill:hover,
+.name-input:-webkit-autofill:focus,
+.name-input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #14171a inset !important;
+  -webkit-text-fill-color: var(--cream) !important;
+  caret-color: var(--gold) !important;
+  border-radius: 18px !important;
+  transition: background-color 5000s ease-in-out 0s;
 }
 
 /* ============================================================
@@ -472,10 +491,11 @@ body.is-ready .gold-line {
 }
 
 .ready-ticket-hint {
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--gold-soft);
   letter-spacing: 0.2px;
+  padding: 0 45px;
 }
 
 .ready-num-display {
@@ -484,19 +504,20 @@ body.is-ready .gold-line {
   line-height: 1;
 }
 
-/* الختم المائل الفاخر */
+/* الختم المائل الفاخر - حجم متناسق ومصغر بأناقة دون ملامسة النص */
 .watermark-stamp {
   position: absolute;
-  top: 14px;
-  left: 16px;
-  border: 2px solid rgba(212, 175, 55, 0.5);
-  color: rgba(212, 175, 55, 0.75);
+  top: 10px;
+  left: 12px;
+  border: 1.5px solid rgba(212, 175, 55, 0.45);
+  color: rgba(212, 175, 55, 0.7);
   font-family: inherit;
-  font-weight: 900;
-  font-size: 16px;
-  padding: 1px 11px;
-  border-radius: 6px;
-  transform: rotate(-12deg);
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  padding: 1.5px 7px;
+  border-radius: 4px;
+  transform: rotate(-10deg);
   pointer-events: none;
   user-select: none;
 }
@@ -520,7 +541,7 @@ body.is-ready .gold-line {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  margin-top: 4px;
+  margin-top: 8px;
   transition: transform 0.1s ease, box-shadow 0.2s ease;
 }
 #onWayBtn:active {
@@ -537,13 +558,14 @@ body.is-ready .gold-line {
   animation: sheen 3.5s ease-in-out infinite;
 }
 
+/* زر استلمت خلاص مع مسافة مريحة ومنفصلة عن زر أنا جاي */
 #receivedBtn {
   width: 100%;
   max-width: 390px;
   border-radius: 16px;
   padding: 13px 20px;
   font-size: 16px;
-  margin-top: 0;
+  margin-top: 14px;
 }
 
 /* ============================================================

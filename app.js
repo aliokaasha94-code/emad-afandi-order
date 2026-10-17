@@ -15,7 +15,6 @@
   const doneCard = $("doneCard");
   const orderNoEl = $("orderNo");
   const readyOrderNoEl = $("readyOrderNo");
-  const bellBtn = $("bellBtn");
   const onWayBtn = $("onWayBtn");
   const onWayText = $("onWayText");
   const receivedBtn = $("receivedBtn");
@@ -82,6 +81,10 @@
   }
 
   function initSupabase(order) {
+    // إظهار شاشة الانتظار فوراً للعميل دون تأخير شبكة
+    const local = readStore()[order] || {};
+    render(local.status || "preparing", local);
+
     try {
       sb = window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY);
       sb.from(CFG.TABLE).select("*").eq("order_number", order).maybeSingle().then(({ data }) => {
@@ -206,6 +209,7 @@
       requestWakeLock();
 
       const isOnWay = meta && Boolean(meta.on_way);
+      const onWayIcon = $("onWayIcon");
       if (isOnWay) {
         // العميل ضغط "أنا جاي" سابقاً: اكتم الصوت وعطّل الزر
         alertSilenced = true;
@@ -214,8 +218,8 @@
           onWayBtn.disabled = true;
           onWayBtn.style.background = "rgba(212, 175, 55, 0.25)";
           onWayBtn.style.color = "var(--gold-bright)";
-          onWayText.innerHTML = '<span data-ic="check"></span>بلّغنا الكاشير إنك في الطريق';
-          if (window.EmadIcons) window.EmadIcons.hydrate(onWayBtn);
+          if (onWayIcon && window.EmadIcons) onWayIcon.innerHTML = window.EmadIcons.check || '';
+          if (onWayText) onWayText.textContent = "بلّغنا الكاشير إنك في الطريق";
         }
       } else {
         // جاهز جديد، أو الكاشير ضغط "إعادة النداء": فك الكتم واشحن الزر ورن مجدداً!
@@ -224,8 +228,8 @@
           onWayBtn.disabled = false;
           onWayBtn.style.background = "";
           onWayBtn.style.color = "";
-          onWayText.innerHTML = '<span data-ic="walk"></span>أنا جاي أستلم';
-          if (window.EmadIcons) window.EmadIcons.hydrate(onWayBtn);
+          if (onWayIcon && window.EmadIcons) onWayIcon.innerHTML = window.EmadIcons.coffee || '';
+          if (onWayText) onWayText.textContent = "أنا جاي أستلم";
         }
         ringReady();
       }
@@ -252,8 +256,9 @@
     alertSilenced = true;
     if (window.EmadSound) window.EmadSound.stopChimeLoop();
 
-    onWayText.innerHTML = '<span data-ic="check"></span>بلّغنا الكاشير إنك في الطريق';
-    if (window.EmadIcons) window.EmadIcons.hydrate(onWayBtn);
+    const onWayIcon = $("onWayIcon");
+    if (onWayIcon && window.EmadIcons) onWayIcon.innerHTML = window.EmadIcons.check || '';
+    if (onWayText) onWayText.textContent = "بلّغنا الكاشير إنك في الطريق";
     onWayBtn.disabled = true;
     onWayBtn.style.background = "rgba(212, 175, 55, 0.25)";
     onWayBtn.style.color = "var(--gold-bright)";
@@ -330,15 +335,13 @@
     const title = $("notifyTitle");
     const sub = $("notifySub");
     const badge = $("notifyBadge");
-    const btnText = $("bellBtnText");
     if (card) card.classList.add("is-armed");
-    if (title) title.textContent = "جرس المنادي مفعّل ✓";
-    if (sub) sub.textContent = "موبايلك هيرن ويهتز بقوة أول ما قهوتك تجهز";
+    if (title) title.textContent = "جرس المنادي مفعّل";
+    if (sub) sub.textContent = "موبايلك هيرن ويهتز بعد ما أوردرك يكون جاهز";
     if (badge) {
-      badge.innerHTML = '<span data-ic="check"></span>';
+      badge.innerHTML = '<span data-ic="bell"></span>';
       if (window.EmadIcons) window.EmadIcons.hydrate(badge);
     }
-    if (btnText) btnText.textContent = "مفعّل ✓";
   }
 
   function armAudioGlobally() {
@@ -364,9 +367,6 @@
     updateArmedUI();
   }
 
-  if (bellBtn) {
-    bellBtn.addEventListener("click", handleArmBtnClick);
-  }
   if ($("notifyCard")) {
     $("notifyCard").addEventListener("click", handleArmBtnClick);
   }

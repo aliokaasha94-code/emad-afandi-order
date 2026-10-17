@@ -144,21 +144,20 @@
         </div>
       </section>
 
-      <!-- كارت تفعيل التنبيهات مع فحص الصوت -->
+      <!-- كارت التنبيهات -->
       <section class="notify-card" id="notifyCard">
         <div class="notify-info">
           <div class="notify-badge" id="notifyBadge"><span data-ic="bell"></span></div>
           <div>
-            <div class="notify-text-title" id="notifyTitle">تفعيل جرس المنادي</div>
-            <div class="notify-text-sub" id="notifySub">اضغط لتأكيد رنين واهتزاز الفون أول ما طلبك يجهز</div>
+            <div class="notify-text-title" id="notifyTitle">جرس المنادي مفعّل</div>
+            <div class="notify-text-sub" id="notifySub">موبايلك هيرن ويهتز بعد ما أوردرك يكون جاهز</div>
           </div>
         </div>
-        <button class="test-sound-btn" id="bellBtn"><span data-ic="volume"></span><span id="bellBtnText">تفعيل الرنين</span></button>
       </section>
 
       <!-- حقل اسم العميل الاختياري -->
       <div class="name-input-wrap">
-        <input class="name-input" id="nameInput" placeholder="اسمك (اختياري)" />
+        <input class="name-input" id="nameInput" placeholder="اسمك (اختياري)" autocomplete="off" autocorrect="off" spellcheck="false" />
       </div>
 
       <p class="hint" style="text-align:center;">اقعد براحتك.. أول ما يخلص فنجانك هيرن موبايلك ويهتز</p>
@@ -181,7 +180,7 @@
 
       <!-- زر "أنا جاي" الفاخر -->
       <button id="onWayBtn">
-        <span data-ic="walk"></span>
+        <span id="onWayIcon" data-ic="coffee"></span>
         <span id="onWayText">أنا جاي أستلم</span>
       </button>
 
