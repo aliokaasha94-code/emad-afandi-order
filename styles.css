@@ -32,20 +32,25 @@
   display: none !important;
 }
 
-html, body {
-  overflow-x: clip;
+html {
+  height: 100%;
+  overflow-x: hidden;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
+  min-height: 100dvh;
   background: var(--bg);
   color: var(--cream);
   font-family: "Noto Kufi Arabic", "Outfit", system-ui, sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   position: relative;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 /* توهجات ذهبية سابحة فخمة */
@@ -73,21 +78,22 @@ body::after {
 }
 
 @keyframes glowDrift {
-  from { transform: translate3d(-3%, -2%, 0) scale(1); }
-  to { transform: translate3d(3%, 3%, 0) scale(1.08); }
+  from { opacity: 0.75; transform: translate3d(-2%, -1%, 0); }
+  to { opacity: 1; transform: translate3d(2%, 1%, 0); }
 }
 
 .wrap {
   position: relative;
   z-index: 1;
   width: 100%;
-  max-width: 460px;
+  max-width: 440px;
   min-width: 0;
-  padding: 24px 20px 40px;
+  margin: auto 0;
+  padding: 16px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
 }
 
 .font-head {
@@ -434,15 +440,15 @@ body.is-ready::before {
 }
 
 @keyframes readyPulse {
-  0% { opacity: 0.75; transform: scale(0.98); }
-  100% { opacity: 1; transform: scale(1.05); }
+  0% { opacity: 0.75; }
+  100% { opacity: 1; }
 }
 
 /* كارت ومكونات شاشة الجاهزية المتناسقة مع كافة شاشات الموبايل */
 body.is-ready .wrap {
-  padding-top: 14px;
-  padding-bottom: 24px;
-  gap: 12px;
+  margin: auto 0;
+  padding: 12px 18px 16px;
+  gap: 10px;
 }
 
 body.is-ready .brand-logo {
@@ -862,8 +868,8 @@ body.is-ready .gold-line {
   z-index: 0;
 }
 @keyframes waveDrift {
-  from { transform: translate3d(-1.5%, 0, 0) scale(1); }
-  to { transform: translate3d(1.5%, -1%, 0) scale(1.03); }
+  from { opacity: 0.45; transform: translate3d(-1%, 0, 0); }
+  to { opacity: 0.65; transform: translate3d(1%, 0, 0); }
 }
 
 /* بطاقة إدخال الرقم يدوياً */

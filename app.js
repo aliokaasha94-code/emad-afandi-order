@@ -80,7 +80,41 @@
     return !!(CFG.SUPABASE_URL && CFG.SUPABASE_ANON_KEY && window.supabase);
   }
 
+  let lastUpdatedAt = null;
+
+  function listenBroadcastChannel(order) {
+    try {
+      if (!bc && "BroadcastChannel" in window) {
+        bc = new BroadcastChannel(CFG.BC_NAME);
+      }
+      if (bc) {
+        bc.onmessage = (ev) => {
+          const m = ev.data || {};
+          if (String(m.order) === String(order)) {
+            if (m.status) {
+              if (m.recall && currentStatus === "ready") {
+                alertSilenced = false;
+                ringReady();
+              } else {
+                render(m.status, m);
+              }
+            }
+          }
+        };
+      }
+    } catch {}
+
+    window.addEventListener("storage", (ev) => {
+      if (ev.key === CFG.STORE_KEY) {
+        const store = readStore();
+        if (store[order]) render(store[order].status, store[order]);
+      }
+    });
+  }
+
   function initSupabase(order) {
+    listenBroadcastChannel(order);
+
     // إظهار شاشة الانتظار فوراً للعميل دون تأخير شبكة
     const local = readStore()[order] || {};
     render(local.status || "preparing", local);
@@ -88,26 +122,35 @@
     try {
       sb = window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY);
       sb.from(CFG.TABLE).select("*").eq("order_number", order).maybeSingle().then(({ data }) => {
-        if (data && data.status) render(data.status, data);
+        if (data && data.status) {
+          lastUpdatedAt = data.updated_at;
+          render(data.status, data);
+        }
       });
       sb.channel(CFG.CHANNEL)
         .on("postgres_changes", { event: "*", schema: "public", table: CFG.TABLE }, (payload) => {
           const row = payload.new || {};
           if (String(row.order_number) === String(order) && row.status) {
+            lastUpdatedAt = row.updated_at;
             render(row.status, row);
           }
         })
         .subscribe();
 
-      // فحص دوري كل 3 ثواني كخط دفاع ثانٍ لو انقطع الـ WebSocket في خلفية الموبايل
+      // فحص دوري كل 2.5 ثانية كخط دفاع ثانٍ لو انقطع الـ WebSocket في خلفية الموبايل
       setInterval(() => {
         if (!sb) return;
         sb.from(CFG.TABLE).select("*").eq("order_number", order).maybeSingle().then(({ data }) => {
-          if (data && data.status && data.status !== currentStatus) {
-            render(data.status, data);
+          if (data && data.status) {
+            const isNewStatus = data.status !== currentStatus;
+            const isNewUpdate = data.updated_at && data.updated_at !== lastUpdatedAt;
+            if (isNewStatus || (isNewUpdate && data.status === "ready")) {
+              lastUpdatedAt = data.updated_at;
+              render(data.status, data);
+            }
           }
         });
-      }, 3000);
+      }, 2500);
     } catch (e) {
       console.warn("Supabase init error, falling back to local:", e);
       initLocal(order);
@@ -119,28 +162,7 @@
     const s = readStore();
     const current = s[order] || {};
     render(current.status || "preparing", current);
-
-    try {
-      if ("BroadcastChannel" in window) {
-        bc = new BroadcastChannel(CFG.BC_NAME);
-        bc.onmessage = (ev) => {
-          const m = ev.data || {};
-          if (String(m.order) === String(order)) {
-            if (m.status) {
-              if (m.recall && currentStatus === "ready") ringReady();
-              else render(m.status, m);
-            }
-          }
-        };
-      }
-    } catch { /* تجاهل */ }
-
-    window.addEventListener("storage", (ev) => {
-      if (ev.key === CFG.STORE_KEY) {
-        const store = readStore();
-        if (store[order]) render(store[order].status, store[order]);
-      }
-    });
+    listenBroadcastChannel(order);
 
     setInterval(() => {
       const store = readStore();

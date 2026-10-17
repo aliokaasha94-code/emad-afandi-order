@@ -189,34 +189,43 @@
   }
 
   async function setStatus(order, status, recall) {
+    const nowIso = new Date().toISOString();
+    const nowMs = Date.now();
+
     if (recall || status === "ready") {
       notifiedOnWay.delete(order);
     }
+
+    // 1. تحديث Supabase السحابي
     if (useSupabase() && sb) {
       try {
         const updatePayload = {
           status,
-          updated_at: new Date().toISOString()
+          updated_at: nowIso
         };
         if (recall || status === "ready") {
           updatePayload.on_way = false;
         }
         await sb.from(CFG.TABLE).update(updatePayload).eq("order_number", order);
         await refresh();
-      } catch (e) {}
-    } else {
-      const s = readStore();
-      if (s[order]) {
-        s[order].status = status;
-        s[order].updatedAt = Date.now();
-        if (recall || status === "ready") {
-          s[order].on_way = false;
-        }
+      } catch (e) {
+        console.warn("Supabase update error:", e);
       }
-      writeStore(s);
-      bcPost({ order, status, on_way: false, ts: Date.now(), recall: !!recall });
-      render();
     }
+
+    // 2. تحديث التخزين المحلي وإرسال البث اللحظي دائماً (يعمل فوراً بين التابات والشاشات)
+    const s = readStore();
+    if (!s[order]) s[order] = { createdAt: nowMs };
+    s[order].status = status;
+    s[order].updatedAt = nowMs;
+    if (recall || status === "ready") {
+      s[order].on_way = false;
+    }
+    writeStore(s);
+    cache[order] = s[order];
+
+    bcPost({ order, status, on_way: false, ts: nowMs, recall: !!recall });
+    if (!useSupabase()) render();
   }
 
   async function refresh() {

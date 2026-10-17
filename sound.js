@@ -96,14 +96,21 @@
     // 1. تشغيل عبر Web Audio API
     const c = audio();
     if (c) {
+      const scheduleTones = () => {
+        try {
+          const t = c.currentTime + 0.02;
+          tone(TONE_1, t, 1.8, 1.4);
+          tone(TONE_HIGH, t + 0.02, 1.0, 0.4);
+          tone(TONE_2, t + 0.36, 2.4, 1.6);
+        } catch (e) {
+          console.warn("Tone schedule error:", e);
+        }
+      };
+
       if (c.state === "suspended") {
-        c.resume().catch(() => {});
-      }
-      if (c.state !== "suspended") {
-        const t = c.currentTime + 0.01;
-        tone(TONE_1, t, 1.8, 1.3);
-        tone(TONE_HIGH, t + 0.01, 1.0, 0.4);
-        tone(TONE_2, t + 0.36, 2.4, 1.5);
+        c.resume().then(scheduleTones).catch(scheduleTones);
+      } else {
+        scheduleTones();
       }
     }
 
@@ -155,19 +162,17 @@
       c.resume().catch(() => {});
     }
 
-    // تشغيل حلقة صامتة تمنع سفاري وموبايل أندرويد من تعليق الـ AudioContext أثناء الانتظار
+    // تشغيل مذبذب صامت بتردد 20Hz لإبقاء قناة الصوت مفتوحة ومستمرة دون تعليق
     if (c && !keepAliveNode) {
       try {
-        const buffer = c.createBuffer(1, c.sampleRate, c.sampleRate);
-        const src = c.createBufferSource();
-        src.buffer = buffer;
-        src.loop = true;
+        const osc = c.createOscillator();
         const silentGain = c.createGain();
-        silentGain.gain.value = 0.0001;
-        src.connect(silentGain);
+        silentGain.gain.setValueAtTime(0.00001, c.currentTime);
+        osc.frequency.setValueAtTime(20, c.currentTime);
+        osc.connect(silentGain);
         silentGain.connect(c.destination);
-        src.start(0);
-        keepAliveNode = src;
+        osc.start();
+        keepAliveNode = osc;
       } catch (e) {}
     }
 
