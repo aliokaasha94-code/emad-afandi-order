@@ -12,16 +12,15 @@ self.addEventListener("activate", (event) => {
 // Handle incoming Web Push notifications
 self.addEventListener("push", (event) => {
   const data = event.data ? event.data.json() : {};
-  const title = data.title || "طلبك جاهز! - عماد أفندي";
+  const title = data.title || "عماد أفندي: طلبك جاهز";
   const options = {
-    body: data.body || "تفضّل استلمه من الكاونتر.. بالهنا والشفا!",
-    icon: "/icon.png",
-    badge: "/badge.png",
-    vibrate: [400, 200, 400, 200, 800],
+    body: data.body || "طلبك جاهز للاستلام الآن من الكاونتر",
+    icon: "/assets/logo.png",
+    badge: "/assets/logo.png",
+    vibrate: [500, 200, 500],
     data: {
       url: data.url || "/",
     },
-    requireInteraction: true,
   };
 
   event.waitUntil(self.registration.showNotification(title, options));

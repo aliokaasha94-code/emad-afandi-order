@@ -231,7 +231,7 @@
     if (alertSilenced) return;
 
     // 1. إطلاق إشعار النظام المباشر بصوت واهتزاز قناة النوتيفيكيشن (STREAM_NOTIFICATION)
-    triggerSystemNotification(false);
+    triggerSystemNotification();
 
     // 2. تشغيل نغمة الويب الداخلية المتكررة
     if (window.EmadSound) {
@@ -243,7 +243,7 @@
     // في حال كان الصوت معلقاً، أول لمسة للشاشة تشغل النوتيفيكيشن والصوت فوراً
     const kickstartOnTouch = () => {
       if (!alertSilenced) {
-        triggerSystemNotification(false);
+        triggerSystemNotification();
         if (window.EmadSound) {
           window.EmadSound.unlockAudio();
           window.EmadSound.playPagerChime();
@@ -444,7 +444,7 @@
           if (window.EmadSound) {
             window.EmadSound.playConfirmBeep();
           }
-          await triggerSystemNotification(true);
+          // نكتفي بنغمة التأكيد والتحديث البصري ولا نرسل إشعار نظام مسبقاً حتى لا يعتبره كروم سبام
         }
       } catch (err) {
         updateArmedUI();

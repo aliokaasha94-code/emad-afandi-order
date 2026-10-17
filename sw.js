@@ -16,7 +16,7 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("message", (event) => {
   const data = event.data || {};
   if (data && data.type === "SHOW_NOTIFICATION") {
-    const title = data.title || "طلبك جاهز! - عماد أفندي";
+    const title = data.title || "عماد أفندي: طلبك جاهز";
     const options = data.options || {};
     event.waitUntil(self.registration.showNotification(title, options));
   }
