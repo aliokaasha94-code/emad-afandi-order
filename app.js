@@ -19,9 +19,9 @@
   const onWayText = $("onWayText");
   const receivedBtn = $("receivedBtn");
   const nameInput = $("nameInput");
-  const howModal = $("howModal");
-  const howOk = $("howOk");
-  const howClose = $("howClose");
+  const armGate = $("armGate");
+  const armGateBtn = $("armGateBtn");
+  const armGateOrderNo = $("armGateOrderNo");
 
   let bellOn = true;
   let alertSilenced = false;
@@ -266,6 +266,7 @@
 
     // 1. حالة تم الاستلام (Done)
     if (status === "done" || status === "picked_up") {
+      if (armGate) armGate.hidden = true;
       trackWrapper.hidden = true;
       readyWrapper.hidden = true;
       doneCard.hidden = false;
@@ -279,6 +280,7 @@
 
     // 2. حالة الطلب جاهز (Ready)
     if (status === "ready") {
+      if (armGate) armGate.hidden = true;
       trackWrapper.hidden = true;
       readyWrapper.hidden = false;
       document.body.classList.add("is-ready");
@@ -315,7 +317,15 @@
     // 3. حالة قيد التحضير (Preparing / Received)
     document.body.classList.remove("is-ready");
     readyWrapper.hidden = true;
-    trackWrapper.hidden = false;
+    const isUnlocked = window.EmadSound && window.EmadSound.isUnlocked();
+    if (!isUnlocked && armGate) {
+      if (armGateOrderNo) armGateOrderNo.textContent = orderNo;
+      armGate.hidden = false;
+      trackWrapper.hidden = true;
+    } else {
+      if (armGate) armGate.hidden = true;
+      trackWrapper.hidden = false;
+    }
     document.title = "طلبك قيد التحضير #" + orderNo + " - عماد أفندي";
     requestWakeLock();
 
@@ -465,6 +475,28 @@
     window.addEventListener(evt, armAudioGlobally, { passive: true });
   });
 
+  /* ---------- بوابة تفعيل الصوت والمنادي الفوري (Arming Gate) ---------- */
+  async function unlockAndRevealOrder(e) {
+    if (e) e.stopPropagation();
+    if (window.EmadSound) {
+      window.EmadSound.unlockAudio();
+      window.EmadSound.playConfirmBeep();
+    }
+    if ("Notification" in window) {
+      try {
+        await Notification.requestPermission();
+      } catch (err) {}
+    }
+    if (armGate) armGate.hidden = true;
+    if (trackWrapper && currentStatus !== "ready" && currentStatus !== "done") {
+      trackWrapper.hidden = false;
+    }
+    updateArmedUI();
+  }
+
+  if (armGateBtn) armGateBtn.addEventListener("click", unlockAndRevealOrder);
+  if (armGate) armGate.addEventListener("click", unlockAndRevealOrder);
+
   if ($("notifyCard")) {
     $("notifyCard").addEventListener("click", (e) => {
       if (e) e.stopPropagation();
@@ -487,41 +519,7 @@
     });
   }
 
-  /* ---------- نافذة الشرح الترحيبية (Onboarding Modal) ---------- */
-  function setupOnboarding() {
-    try {
-      const seen = localStorage.getItem("emad_how_v3");
-      if (!seen && orderNo && howModal) {
-        howModal.hidden = false;
-      }
-    } catch (e) {}
-
-    const dismissModal = () => {
-      if (howModal) howModal.hidden = true;
-      try {
-        localStorage.setItem("emad_how_v3", "1");
-      } catch (e) {}
-
-      // فك حظر الصوت وتأكيده فوراً عند ضغطة الزر
-      if (window.EmadSound) {
-        window.EmadSound.playConfirmBeep();
-      }
-      updateArmedUI();
-
-      // طلب إذن التنبيهات
-      if ("Notification" in window) {
-        try {
-          Notification.requestPermission();
-        } catch (e) {}
-      }
-    };
-
-    if (howOk) howOk.addEventListener("click", dismissModal);
-    if (howClose) howClose.addEventListener("click", dismissModal);
-  }
-
   /* ---------- الإقلاع الأولي ---------- */
-  setupOnboarding();
 
   if (!orderNo) {
     enterCard.hidden = false;

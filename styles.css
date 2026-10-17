@@ -320,6 +320,37 @@ body::after {
   margin-top: 1px;
 }
 
+/* كارت بوابة التفعيل الفورية */
+.arm-gate-card {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 24px 20px;
+  background: var(--card);
+  border: 1px solid var(--gold-border);
+  border-radius: 24px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+  animation: notifyPulse 2s ease-in-out infinite alternate;
+  cursor: pointer;
+}
+.arm-gate-badge {
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #f5d36e, #d4af37);
+  color: #171105;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+.arm-gate-badge svg {
+  width: 28px;
+  height: 28px;
+}
+
 /* كارت التنبيه الفندقي */
 .notify-card {
   width: 100%;

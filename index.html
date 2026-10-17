@@ -93,6 +93,18 @@
       <p class="hint">أو امسح كود QR المطبوع على البون بكاميرا الموبايل</p>
     </section>
 
+    <!-- بوابة تفعيل التنبيه والصوت الفوري (Arming Gate) -->
+    <section class="card arm-gate-card" id="armGate" hidden>
+      <div class="arm-gate-badge"><span data-ic="bell"></span></div>
+      <div class="ticket-label" style="font-size:14px; margin-top:8px;">طلب رقم</div>
+      <div class="order-no" style="font-size:42px; margin:4px 0;"><span class="hash">#</span><span id="armGateOrderNo">–</span></div>
+      <p class="status-text warm" style="font-weight:700; font-size:16px; margin:8px 0 16px;">اضغط لاستلام رقم طلبك وتفعيل الرنين والاهتزاز فوراً</p>
+      <button class="btn btn-gold" id="armGateBtn" style="width:100%; font-size:18px; padding:16px 20px;">
+        <span data-ic="bell"></span> استلم رقمك وفعل المنادي
+      </button>
+      <p class="hint" style="margin-top:12px; margin-bottom:0;">ضغطة واحدة لضمان رنين الموبايل تلقائياً أول ما يجهز أوردرك</p>
+    </section>
+
     <!-- 2. كارت التذكرة الفندقية الفاخرة أثناء الانتظار (قيد التحضير) -->
     <div id="trackWrapper" hidden style="width:100%; display:flex; flex-direction:column; gap:16px;">
       
@@ -202,43 +214,6 @@
       </a>
     </section>
   </main>
-
-  <!-- 5. نافذة الشرح الترحيبية (Onboarding Modal - Bottom Sheet) -->
-  <div class="modal-overlay" id="howModal" hidden>
-    <div class="modal-content">
-      <div class="modal-header">
-        <span style="font-weight:800; font-size:14px; color:var(--gold);">عماد أفندي</span>
-        <button class="modal-close" id="howClose"><span data-ic="close"></span></button>
-      </div>
-
-      <div class="modal-title font-head">إزاي بيشتغل المنادي الذكي؟</div>
-
-      <div class="how-cards-grid">
-        <div class="how-card-box">
-          <div class="how-card-badge"><span data-ic="ticket"></span></div>
-          <div class="how-card-title">1. رقم طلبك</div>
-          <div class="how-card-desc">احفظ الرقم اللي على الريسيت</div>
-        </div>
-
-        <div class="how-card-box">
-          <div class="how-card-badge"><span data-ic="coffee"></span></div>
-          <div class="how-card-title">2. بنحضّر طلبك</div>
-          <div class="how-card-desc">طلبك بيتحضّر بعناية</div>
-        </div>
-
-        <div class="how-card-box">
-          <div class="how-card-badge" style="background:var(--gold); color:#000;"><span data-ic="bell"></span></div>
-          <div class="how-card-title">3. موبايلك هيرن</div>
-          <div class="how-card-desc">رنين واهتزاز أول ما يجهز</div>
-        </div>
-      </div>
-
-      <button class="modal-action-btn font-head" id="howOk">
-        <span data-ic="bell"></span> تمام، رنّلي لما يجهز
-      </button>
-      <p class="hint" style="text-align:center; margin-top:8px;">بعدها هيسألك المتصفح: اضغط «سماح» للإشعارات</p>
-    </div>
-  </div>
 
   <script src="config.js"></script>
   <script src="icons.js"></script>
