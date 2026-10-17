@@ -29,6 +29,67 @@
   let sb = null;
   let bc = null;
   let wakeLockObj = null;
+  let swReg = null;
+
+  /* ---------- تسجيل Service Worker لدعم إشعارات ونغمات النظام المباشرة ---------- */
+  async function registerServiceWorker() {
+    if (!("serviceWorker" in navigator)) return null;
+    try {
+      const reg = await navigator.serviceWorker.register("sw.js", { scope: "./" });
+      swReg = reg;
+      return reg;
+    } catch (e) {
+      console.warn("SW register error:", e);
+      return null;
+    }
+  }
+  registerServiceWorker();
+
+  /* ---------- إطلاق إشعار النظام بصوت واهتزاز قناة النوتيفيكيشن (STREAM_NOTIFICATION) ---------- */
+  async function triggerSystemNotification(isTest) {
+    if (!("Notification" in window)) return;
+    if (Notification.permission !== "granted") return;
+
+    const title = isTest
+      ? "تم تفعيل جرس المنادي بنجاح ✓"
+      : "طلبك جاهز! #" + orderNo + " - عماد أفندي";
+    const body = isTest
+      ? "سيرن موبايلك بنغمة الإشعارات الرسمية فور تجهيز طلبك #" + orderNo
+      : "تفضّل استلمه من الكاونتر.. بالهنا والشفا";
+
+    const options = {
+      body,
+      icon: "assets/logo.png",
+      badge: "assets/logo.png",
+      vibrate: isTest ? [200, 100, 200] : [600, 250, 600, 250, 1000],
+      tag: isTest ? "test-arm" : "emad-order-" + orderNo,
+      renotify: true,
+      requireInteraction: !isTest,
+      silent: false, // يضمن تشغيل صوت نوتيفيكيشن الموبايل (STREAM_NOTIFICATION)
+      data: {
+        url: location.href,
+        order: orderNo
+      }
+    };
+
+    // 1. الأولوية للـ Service Worker على أندرويد لربطه بقناة صوت النوتيفيكيشن الرسمية
+    try {
+      if ("serviceWorker" in navigator) {
+        const reg = swReg || (await navigator.serviceWorker.ready);
+        if (reg && reg.showNotification) {
+          await reg.showNotification(title, options);
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn("SW showNotification error:", e);
+    }
+
+    // 2. بديل لمتصفحات سطح المكتب
+    try {
+      new Notification(title, options);
+    } catch (e) {}
+  }
 
   /* ---------- منع إغلاق الشاشة (Screen Wake Lock) ---------- */
   async function requestWakeLock() {
@@ -137,7 +198,7 @@
         })
         .subscribe();
 
-      // فحص دوري كل 2.5 ثانية كخط دفاع ثانٍ لو انقطع الـ WebSocket في خلفية الموبايل
+      // فحص دوري كل 1.2 ثانية كخط دفاع فوري وسريع لو انقطع الـ WebSocket في خلفية الموبايل
       setInterval(() => {
         if (!sb) return;
         sb.from(CFG.TABLE).select("*").eq("order_number", order).maybeSingle().then(({ data }) => {
@@ -150,7 +211,7 @@
             }
           }
         });
-      }, 2500);
+      }, 1200);
     } catch (e) {
       console.warn("Supabase init error, falling back to local:", e);
       initLocal(order);
@@ -171,39 +232,34 @@
     }, CFG.POLL_MS || 2000);
   }
 
-  /* ---------- التنبيه بالرنين والاهتزاز ---------- */
-  /* ---------- التنبيه بالرنين والاهتزاز ---------- */
+  /* ---------- التنبيه بالرنين والاهتزاز ونوتيفيكيشن النظام ---------- */
   function ringReady() {
     if (alertSilenced) return;
+
+    // 1. إطلاق إشعار النظام المباشر بصوت واهتزاز قناة النوتيفيكيشن (STREAM_NOTIFICATION)
+    triggerSystemNotification(false);
+
+    // 2. تشغيل نغمة الويب الداخلية المتكررة
     if (window.EmadSound) {
-      window.EmadSound.startChimeLoop(CFG.CHIME_EVERY_MS || 3500);
+      window.EmadSound.startChimeLoop(CFG.CHIME_EVERY_MS || 3000);
     }
     document.title = "طلبك جاهز! #" + orderNo + " - عماد أفندي";
     requestWakeLock();
 
-    // لو كان الصوت معلقاً بسبب قيود المتصفح لعدم وجود لمس مسبق، بمجرد أي لمسة على الشاشة يشتغل فوراً
+    // في حال كان الصوت معلقاً، أول لمسة للشاشة تشغل النوتيفيكيشن والصوت فوراً
     const kickstartOnTouch = () => {
-      if (window.EmadSound && !alertSilenced) {
-        window.EmadSound.unlockAudio();
-        window.EmadSound.startChimeLoop(CFG.CHIME_EVERY_MS || 3500);
+      if (!alertSilenced) {
+        triggerSystemNotification(false);
+        if (window.EmadSound) {
+          window.EmadSound.unlockAudio();
+          window.EmadSound.playPagerChime();
+          window.EmadSound.startChimeLoop(CFG.CHIME_EVERY_MS || 3000);
+        }
       }
     };
     window.addEventListener("touchstart", kickstartOnTouch, { once: true, passive: true });
     window.addEventListener("pointerdown", kickstartOnTouch, { once: true, passive: true });
     window.addEventListener("click", kickstartOnTouch, { once: true, passive: true });
-
-    // إشعار نظام مدمج (Native System Notification)
-    if ("Notification" in window && Notification.permission === "granted") {
-      try {
-        new Notification("طلبك جاهز! #" + orderNo + " - عماد أفندي", {
-          body: "تفضّل استلمه من الكاونتر.. بالهنا والشفا",
-          icon: "assets/logo.png",
-          badge: "assets/logo.png",
-          vibrate: [400, 150, 400, 150, 700],
-          tag: "emad-order-" + orderNo,
-        });
-      } catch (e) {}
-    }
   }
 
   /* ---------- عرض الحالات المختلفة (UI States) ---------- */
@@ -357,12 +413,50 @@
     const title = $("notifyTitle");
     const sub = $("notifySub");
     const badge = $("notifyBadge");
-    if (card) card.classList.add("is-armed");
-    if (title) title.textContent = "جرس المنادي مفعّل";
-    if (sub) sub.textContent = "موبايلك هيرن ويهتز بعد ما أوردرك يكون جاهز";
-    if (badge) {
-      badge.innerHTML = '<span data-ic="bell"></span>';
-      if (window.EmadIcons) window.EmadIcons.hydrate(badge);
+    if (!card) return;
+
+    const isGranted = "Notification" in window && Notification.permission === "granted";
+
+    if (isGranted) {
+      card.classList.remove("needs-permission");
+      card.classList.add("is-armed");
+      if (title) title.textContent = "جرس المنادي مفعّل";
+      if (sub) sub.textContent = "موبايلك هيرن ويهتز بعد ما أوردرك يكون جاهز";
+      if (badge) {
+        badge.innerHTML = '<span data-ic="bell"></span>';
+        if (window.EmadIcons) window.EmadIcons.hydrate(badge);
+      }
+    } else {
+      card.classList.add("needs-permission");
+      card.classList.remove("is-armed");
+      if (title) title.textContent = "اضغط لتفعيل جرس الإشعارات 🔔";
+      if (sub) sub.textContent = "اضغط «سماح» ليرن موبايلك بنغمة الإشعارات أول ما يجهز";
+      if (badge) {
+        badge.innerHTML = '<span data-ic="bell"></span>';
+        if (window.EmadIcons) window.EmadIcons.hydrate(badge);
+      }
+    }
+  }
+
+  async function requestNotificationAccess(showConfirm) {
+    if (window.EmadSound) {
+      window.EmadSound.unlockAudio();
+    }
+    if ("Notification" in window) {
+      try {
+        const perm = await Notification.requestPermission();
+        updateArmedUI();
+        if (perm === "granted" && showConfirm) {
+          if (window.EmadSound) {
+            window.EmadSound.playConfirmBeep();
+          }
+          await triggerSystemNotification(true);
+        }
+      } catch (err) {
+        updateArmedUI();
+      }
+    } else {
+      updateArmedUI();
     }
   }
 
@@ -370,28 +464,26 @@
     if (window.EmadSound) {
       window.EmadSound.unlockAudio();
     }
+    if ("Notification" in window && Notification.permission === "default") {
+      requestNotificationAccess(false);
+    }
     updateArmedUI();
   }
 
-  // فك حظر الصوت فوراً مع أول لمسة للموبايل في أي مكان بالصفحة
+  // فك حظر الصوت والنوتيفيكيشن فوراً مع أول لمسة للموبايل في أي مكان بالصفحة
   ["touchstart", "touchend", "pointerdown", "click"].forEach((evt) => {
     window.addEventListener(evt, armAudioGlobally, { passive: true, once: true });
   });
 
-  function handleArmBtnClick(e) {
-    if (e) e.stopPropagation();
-    if (window.EmadSound) {
-      window.EmadSound.playConfirmBeep();
-    }
-    if ("Notification" in window) {
-      try { Notification.requestPermission(); } catch (err) {}
-    }
-    updateArmedUI();
+  if ($("notifyCard")) {
+    $("notifyCard").addEventListener("click", (e) => {
+      if (e) e.stopPropagation();
+      requestNotificationAccess(true);
+    });
   }
 
-  if ($("notifyCard")) {
-    $("notifyCard").addEventListener("click", handleArmBtnClick);
-  }
+  // فحص أولي للحالة فور فتح الصفحة
+  updateArmedUI();
 
   if (nameInput) {
     nameInput.addEventListener("change", () => saveCustomerName(nameInput.value));
@@ -455,4 +547,10 @@
   }
 
   if (window.EmadIcons) window.EmadIcons.hydrate();
+
+  window.EmadNotify = {
+    triggerSystemNotification,
+    updateArmedUI,
+    requestNotificationAccess
+  };
 })();

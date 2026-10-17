@@ -325,12 +325,26 @@ body::after {
   width: 100%;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   background: var(--card);
   border: 1px solid var(--gold-border);
   border-radius: 22px;
   padding: 14px 18px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.notify-card:active {
+  transform: scale(0.98);
+}
+.notify-card.needs-permission {
+  border-color: var(--gold);
+  box-shadow: 0 0 22px rgba(212, 175, 55, 0.35);
+  animation: notifyPulse 2s ease-in-out infinite alternate;
+}
+@keyframes notifyPulse {
+  0% { transform: scale(0.99); box-shadow: 0 0 10px rgba(212, 175, 55, 0.2); }
+  100% { transform: scale(1.01); box-shadow: 0 0 24px rgba(212, 175, 55, 0.5); }
 }
 .notify-info {
   display: flex;
