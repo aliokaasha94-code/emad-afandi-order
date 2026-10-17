@@ -320,36 +320,7 @@ body::after {
   margin-top: 1px;
 }
 
-/* كارت بوابة التفعيل الفورية */
-.arm-gate-card {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 24px 20px;
-  background: var(--card);
-  border: 1px solid var(--gold-border);
-  border-radius: 24px;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
-  animation: notifyPulse 2s ease-in-out infinite alternate;
-  cursor: pointer;
-}
-.arm-gate-badge {
-  width: 56px;
-  height: 56px;
-  border-radius: 18px;
-  background: linear-gradient(135deg, #f5d36e, #d4af37);
-  color: #171105;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 4px;
-}
-.arm-gate-badge svg {
-  width: 28px;
-  height: 28px;
-}
+
 
 /* كارت التنبيه الفندقي */
 .notify-card {
@@ -620,17 +591,19 @@ body.is-ready .gold-line {
 }
 
 /* ============================================================
-   نافذة الشرح الترحيبية (Bottom Sheet Onboarding Modal)
+   نافذة الشرح الترحيبية على طريقة ناديني (Nadeeni Bottom Sheet)
    ============================================================ */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(6px);
-  z-index: 100;
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1000;
   display: flex;
   align-items: flex-end;
   justify-content: center;
+  transition: opacity 0.3s ease;
 }
 @media (min-width: 540px) {
   .modal-overlay {
@@ -640,18 +613,24 @@ body.is-ready .gold-line {
 }
 
 .modal-content {
+  position: relative;
   width: 100%;
-  max-width: 460px;
-  background: #111416;
-  border: 1px solid var(--gold-border);
-  border-radius: 36px 36px 0 0;
-  padding: 24px 22px 32px;
-  box-shadow: 0 -15px 50px rgba(0, 0, 0, 0.8), 0 0 35px rgba(212, 175, 55, 0.15);
-  animation: slideUp 0.35s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+  max-width: 440px;
+  background: #16120e;
+  border-top: 1.5px solid rgba(212, 175, 55, 0.35);
+  border-left: 1px solid rgba(212, 175, 55, 0.15);
+  border-right: 1px solid rgba(212, 175, 55, 0.15);
+  border-radius: 32px 32px 0 0;
+  padding: 24px 18px 28px;
+  box-shadow: 0 -15px 50px rgba(0, 0, 0, 0.9), 0 0 35px rgba(212, 175, 55, 0.15);
+  animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  display: flex;
+  flex-direction: column;
 }
 @media (min-width: 540px) {
   .modal-content {
-    border-radius: 36px;
+    border-radius: 32px;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.15);
     animation: scaleIn 0.3s ease both;
   }
 }
@@ -665,85 +644,143 @@ body.is-ready .gold-line {
   to { transform: scale(1); opacity: 1; }
 }
 
-.modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
 .modal-close {
-  width: 34px;
-  height: 34px;
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.08);
-  border: 0;
+  border: 1px solid rgba(255, 255, 255, 0.06);
   color: var(--muted);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 16px;
+  transition: all 0.2s ease;
+  z-index: 10;
 }
+.modal-close:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: var(--cream);
+}
+.modal-close svg {
+  width: 18px;
+  height: 18px;
+}
+
 .modal-title {
   font-size: 22px;
   font-weight: 900;
   color: var(--cream);
   text-align: center;
-  margin: 6px 0 18px;
+  margin: 4px 0 20px;
+  letter-spacing: -0.2px;
 }
 
 .how-cards-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  gap: 10px;
+  margin-bottom: 20px;
+  direction: rtl;
 }
 
 .how-card-box {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(212, 175, 55, 0.2);
-  border-radius: 18px;
-  padding: 14px 6px;
+  position: relative;
+  background: #201a14;
+  border: 1.5px solid rgba(212, 175, 55, 0.25);
+  border-radius: 20px;
+  padding: 14px 6px 12px;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
+  min-height: 146px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s ease, border-color 0.2s ease;
 }
+.how-card-box:hover {
+  transform: translateY(-2px);
+  border-color: rgba(212, 175, 55, 0.45);
+}
+
 .how-card-badge {
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
-  background: rgba(212, 175, 55, 0.15);
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #0f0b08;
   border: 1.5px solid var(--gold);
   color: var(--gold-bright);
+  font-family: "Outfit", sans-serif;
+  font-size: 13px;
+  font-weight: 900;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
 }
+
+.how-card-illus {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 60px;
+  width: 100%;
+  margin: 6px 0 4px;
+}
+.how-card-illus svg {
+  max-width: 100%;
+  max-height: 100%;
+  filter: drop-shadow(0 2px 8px rgba(212, 175, 55, 0.2));
+}
+
 .how-card-title {
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 800;
   color: var(--cream);
-}
-.how-card-desc {
-  font-size: 11px;
-  color: var(--muted);
-  line-height: 1.4;
+  line-height: 1.35;
+  text-align: center;
+  padding: 0 2px;
 }
 
 .modal-action-btn {
-  margin-top: 20px;
   width: 100%;
   border-radius: 99px;
-  padding: 16px;
+  padding: 16px 20px;
   font-size: 18px;
-  font-weight: 800;
+  font-weight: 900;
   background: linear-gradient(135deg, #f5d36e, #d4af37);
   color: #171105;
   border: 0;
-  box-shadow: 0 6px 25px rgba(212, 175, 55, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 8px 25px rgba(212, 175, 55, 0.35);
   cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.15s ease;
+}
+.modal-action-btn:active {
+  transform: scale(0.98);
+}
+.modal-action-btn svg {
+  width: 22px;
+  height: 22px;
+  stroke: #171105;
+}
+
+.modal-subhint {
+  font-size: 12.5px;
+  color: var(--muted);
+  text-align: center;
+  margin-top: 10px;
+  margin-bottom: 0;
 }
 
 /* ============================================================

@@ -19,9 +19,10 @@
   const onWayText = $("onWayText");
   const receivedBtn = $("receivedBtn");
   const nameInput = $("nameInput");
-  const armGate = $("armGate");
-  const armGateBtn = $("armGateBtn");
-  const armGateOrderNo = $("armGateOrderNo");
+  const howModal = $("howModal");
+  const howOk = $("howOk");
+  const howClose = $("howClose");
+  const howCardOrderNo = $("howCardOrderNo");
 
   let bellOn = true;
   let alertSilenced = false;
@@ -266,7 +267,7 @@
 
     // 1. حالة تم الاستلام (Done)
     if (status === "done" || status === "picked_up") {
-      if (armGate) armGate.hidden = true;
+      if (howModal) howModal.hidden = true;
       trackWrapper.hidden = true;
       readyWrapper.hidden = true;
       doneCard.hidden = false;
@@ -280,7 +281,7 @@
 
     // 2. حالة الطلب جاهز (Ready)
     if (status === "ready") {
-      if (armGate) armGate.hidden = true;
+      if (howModal) howModal.hidden = true;
       trackWrapper.hidden = true;
       readyWrapper.hidden = false;
       document.body.classList.add("is-ready");
@@ -317,14 +318,13 @@
     // 3. حالة قيد التحضير (Preparing / Received)
     document.body.classList.remove("is-ready");
     readyWrapper.hidden = true;
+    trackWrapper.hidden = false;
+    if (howCardOrderNo) howCardOrderNo.textContent = "#" + orderNo;
     const isUnlocked = window.EmadSound && window.EmadSound.isUnlocked();
-    if (!isUnlocked && armGate) {
-      if (armGateOrderNo) armGateOrderNo.textContent = orderNo;
-      armGate.hidden = false;
-      trackWrapper.hidden = true;
-    } else {
-      if (armGate) armGate.hidden = true;
-      trackWrapper.hidden = false;
+    if (!isUnlocked && howModal) {
+      howModal.hidden = false;
+    } else if (howModal) {
+      howModal.hidden = true;
     }
     document.title = "طلبك قيد التحضير #" + orderNo + " - عماد أفندي";
     requestWakeLock();
@@ -475,8 +475,8 @@
     window.addEventListener(evt, armAudioGlobally, { passive: true });
   });
 
-  /* ---------- بوابة تفعيل الصوت والمنادي الفوري (Arming Gate) ---------- */
-  async function unlockAndRevealOrder(e) {
+  /* ---------- تأكيد تفعيل المنادي وفك حظر الصوت (Nadeeni Flow) ---------- */
+  async function confirmAndUnlockAudio(e) {
     if (e) e.stopPropagation();
     if (window.EmadSound) {
       window.EmadSound.unlockAudio();
@@ -487,15 +487,17 @@
         await Notification.requestPermission();
       } catch (err) {}
     }
-    if (armGate) armGate.hidden = true;
-    if (trackWrapper && currentStatus !== "ready" && currentStatus !== "done") {
-      trackWrapper.hidden = false;
-    }
+    if (howModal) howModal.hidden = true;
     updateArmedUI();
   }
 
-  if (armGateBtn) armGateBtn.addEventListener("click", unlockAndRevealOrder);
-  if (armGate) armGate.addEventListener("click", unlockAndRevealOrder);
+  if (howOk) howOk.addEventListener("click", confirmAndUnlockAudio);
+  if (howClose) howClose.addEventListener("click", (e) => {
+    if (e) e.stopPropagation();
+    if (window.EmadSound) window.EmadSound.unlockAudio();
+    if (howModal) howModal.hidden = true;
+    updateArmedUI();
+  });
 
   if ($("notifyCard")) {
     $("notifyCard").addEventListener("click", (e) => {

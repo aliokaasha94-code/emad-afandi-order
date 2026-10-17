@@ -93,18 +93,6 @@
       <p class="hint">أو امسح كود QR المطبوع على البون بكاميرا الموبايل</p>
     </section>
 
-    <!-- بوابة تفعيل التنبيه والصوت الفوري (Arming Gate) -->
-    <section class="card arm-gate-card" id="armGate" hidden>
-      <div class="arm-gate-badge"><span data-ic="bell"></span></div>
-      <div class="ticket-label" style="font-size:14px; margin-top:8px;">طلب رقم</div>
-      <div class="order-no" style="font-size:42px; margin:4px 0;"><span class="hash">#</span><span id="armGateOrderNo">–</span></div>
-      <p class="status-text warm" style="font-weight:700; font-size:16px; margin:8px 0 16px;">اضغط لاستلام رقم طلبك وتفعيل الرنين والاهتزاز فوراً</p>
-      <button class="btn btn-gold" id="armGateBtn" style="width:100%; font-size:18px; padding:16px 20px;">
-        <span data-ic="bell"></span> استلم رقمك وفعل المنادي
-      </button>
-      <p class="hint" style="margin-top:12px; margin-bottom:0;">ضغطة واحدة لضمان رنين الموبايل تلقائياً أول ما يجهز أوردرك</p>
-    </section>
-
     <!-- 2. كارت التذكرة الفندقية الفاخرة أثناء الانتظار (قيد التحضير) -->
     <div id="trackWrapper" hidden style="width:100%; display:flex; flex-direction:column; gap:16px;">
       
@@ -156,17 +144,6 @@
         </div>
       </section>
 
-      <!-- كارت التنبيهات -->
-      <section class="notify-card needs-permission" id="notifyCard">
-        <div class="notify-info">
-          <div class="notify-badge" id="notifyBadge"><span data-ic="bell"></span></div>
-          <div>
-            <div class="notify-text-title" id="notifyTitle">اضغط لتفعيل جرس المنادي 🔔</div>
-            <div class="notify-text-sub" id="notifySub">اضغط هنا لضمان رنين الموبايل واهتزازه فور جاهزية طلبك</div>
-          </div>
-        </div>
-      </section>
-
       <!-- حقل اسم العميل الاختياري -->
       <div class="name-input-wrap">
         <input class="name-input" id="nameInput" placeholder="اسمك (اختياري)" autocomplete="off" autocorrect="off" spellcheck="false" />
@@ -214,6 +191,74 @@
       </a>
     </section>
   </main>
+
+  <!-- نافذة الشرح الترحيبية على طريقة ناديني (Nadeeni-Style Bottom Sheet) -->
+  <div class="modal-overlay" id="howModal" hidden>
+    <div class="modal-content">
+      <button class="modal-close" id="howClose" aria-label="إغلاق"><span data-ic="close"></span></button>
+
+      <div class="modal-title font-head">كده بيشتغل المنادي</div>
+
+      <div class="how-cards-grid">
+        <!-- كارت 1: رقم حضرتك -->
+        <div class="how-card-box">
+          <div class="how-card-badge">1</div>
+          <div class="how-card-illus">
+            <svg width="48" height="52" viewBox="0 0 48 52" fill="none">
+              <rect x="10" y="3" width="28" height="46" rx="6" stroke="#d4af37" stroke-width="2.2" fill="#1b1612"/>
+              <rect x="13" y="9" width="22" height="32" rx="2" fill="#261f18"/>
+              <line x1="20" y1="6" x2="28" y2="6" stroke="#d4af37" stroke-width="1.8" stroke-linecap="round"/>
+              <line x1="21" y1="44" x2="27" y2="44" stroke="#a89b88" stroke-width="1.5" stroke-linecap="round"/>
+              <text id="howCardOrderNo" x="24" y="27" font-family="'Outfit', 'Cairo', sans-serif" font-weight="900" font-size="14" fill="#f5d36e" text-anchor="middle" dominant-baseline="middle">#–</text>
+            </svg>
+          </div>
+          <div class="how-card-title">رقم حضرتك</div>
+        </div>
+
+        <!-- كارت 2: أوردر حضرتك بيتحضر -->
+        <div class="how-card-box">
+          <div class="how-card-badge">2</div>
+          <div class="how-card-illus">
+            <svg width="48" height="52" viewBox="0 0 48 52" fill="none">
+              <path d="M12 24 C12 35 16 40 24 40 C32 40 36 35 36 24 Z" fill="#261f18" stroke="#d4af37" stroke-width="2.2"/>
+              <path d="M36 26 C40 26 43 29 43 32 C43 35 40 38 36 38" stroke="#d4af37" stroke-width="2" stroke-linecap="round" fill="none"/>
+              <line x1="9" y1="24" x2="39" y2="24" stroke="#d4af37" stroke-width="2.2" stroke-linecap="round"/>
+              <path d="M19 19 C17 16 21 14 19 11" stroke="#f5d36e" stroke-width="2" stroke-linecap="round" fill="none"/>
+              <path d="M24 17 C22 14 26 12 24 9" stroke="#f5d36e" stroke-width="2" stroke-linecap="round" fill="none"/>
+              <path d="M29 19 C27 16 31 14 29 11" stroke="#f5d36e" stroke-width="2" stroke-linecap="round" fill="none"/>
+              <line x1="18" y1="43" x2="30" y2="43" stroke="#d4af37" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="how-card-title">أوردر حضرتك بيتحضر</div>
+        </div>
+
+        <!-- كارت 3: تليفونك بيرن لما يجهز -->
+        <div class="how-card-box">
+          <div class="how-card-badge">3</div>
+          <div class="how-card-illus">
+            <svg width="48" height="52" viewBox="0 0 48 52" fill="none">
+              <g transform="rotate(-6 24 28)">
+                <rect x="14" y="10" width="20" height="34" rx="5" fill="#261f18" stroke="#d4af37" stroke-width="2.2"/>
+                <path d="M24 19 C21.5 19 20 20.5 20 23 C20 27 18 29 17 30 H31 C30 29 28 27 28 23 C28 20.5 26.5 19 24 19 Z" fill="#f5d36e"/>
+                <circle cx="24" cy="32.5" r="1.3" fill="#f5d36e"/>
+              </g>
+              <path d="M38 18 C41 21 41 29 38 32" stroke="#f5d36e" stroke-width="2" stroke-linecap="round" fill="none"/>
+              <path d="M42 14 C47 19 47 33 42 38" stroke="#d4af37" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+              <path d="M10 18 C7 21 7 29 10 32" stroke="#f5d36e" stroke-width="2" stroke-linecap="round" fill="none"/>
+              <path d="M6 14 C1 19 1 33 6 38" stroke="#d4af37" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+            </svg>
+          </div>
+          <div class="how-card-title">تليفونك بيرن لما يجهز</div>
+        </div>
+      </div>
+
+      <button class="modal-action-btn font-head" id="howOk">
+        <span data-ic="bell"></span> تمام، رنّلي لما يجهز
+      </button>
+
+      <p class="modal-subhint">بعدها هيسألك المتصفح: اضغط «سماح»</p>
+    </div>
+  </div>
 
   <script src="config.js"></script>
   <script src="icons.js"></script>
