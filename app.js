@@ -46,25 +46,19 @@
   registerServiceWorker();
 
   /* ---------- إطلاق إشعار النظام بصوت واهتزاز قناة النوتيفيكيشن (STREAM_NOTIFICATION) ---------- */
-  async function triggerSystemNotification(isTest) {
+  async function triggerSystemNotification() {
     if (!("Notification" in window)) return;
     if (Notification.permission !== "granted") return;
 
-    const title = isTest
-      ? "تم تفعيل جرس المنادي بنجاح ✓"
-      : "طلبك جاهز! #" + orderNo + " - عماد أفندي";
-    const body = isTest
-      ? "سيرن موبايلك بنغمة الإشعارات الرسمية فور تجهيز طلبك #" + orderNo
-      : "تفضّل استلمه من الكاونتر.. بالهنا والشفا";
+    const title = "عماد أفندي: طلب رقم " + orderNo + " جاهز";
+    const body = "طلبك جاهز للاستلام الآن من الكاونتر";
 
     const options = {
       body,
       icon: "assets/logo.png",
       badge: "assets/logo.png",
-      vibrate: isTest ? [200, 100, 200] : [600, 250, 600, 250, 1000],
-      tag: isTest ? "test-arm" : "emad-order-" + orderNo,
-      renotify: true,
-      requireInteraction: !isTest,
+      vibrate: [500, 200, 500],
+      tag: "emad-order-" + orderNo,
       silent: false, // يضمن تشغيل صوت نوتيفيكيشن الموبايل (STREAM_NOTIFICATION)
       data: {
         url: location.href,
