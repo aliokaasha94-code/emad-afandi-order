@@ -61,7 +61,7 @@
     const options = {
       body,
       icon: "assets/logo.png",
-      badge: "assets/logo.png",
+      badge: "assets/badge.png",
       vibrate: [600, 250, 600, 250, 1000],
       tag: "emad-ready-" + orderNo, // كارت موحد يمنع تراكم إشعارات متعددة
       renotify: true, // يضمن رنين واهتزاز الموبايل في كل نداء
