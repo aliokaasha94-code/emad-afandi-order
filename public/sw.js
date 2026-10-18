@@ -16,7 +16,7 @@ self.addEventListener("push", (event) => {
   const options = {
     body: data.body || "طلبك جاهز للاستلام الآن من الكاونتر",
     icon: "/assets/logo.png",
-    badge: "/assets/logo.png",
+    badge: "/assets/badge.png",
     vibrate: [500, 200, 500],
     data: {
       url: data.url || "/",
