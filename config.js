@@ -23,8 +23,8 @@ window.EMAD_CONFIG = {
   READY_VIB: [400, 200, 400, 200, 800], // نمط اهتزاز الجاهزية
 
   // --- روابط ---
-  // رابط تقييم جوجل مابس (بدّل xxx برابط مكانك الحقيقي من Google Business)
-  MAPS_URL: "https://www.google.com/maps/search/?api=1&query=عماد+أفندي+كفر+الشيخ",
+  // رابط تقييم جوجل مابس المباشر
+  MAPS_URL: "https://g.page/r/CdBfx7NFswIzEAE/review",
 
   // مفاتيح التخزين المحلي (لا تغيّرها)
   STORE_KEY: "emad_orders_v1",
