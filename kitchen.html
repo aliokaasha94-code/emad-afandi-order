@@ -84,31 +84,19 @@
       <p class="hint">عميل؟ امسح QR الكاونتر.. أو <a href="take" style="color:var(--gold);">افتح صفحة استلام رقم</a></p>
     </section>
 
-    <!-- الشاشة الرئيسية -->
-    <div id="mainBox" hidden style="width:100%; display:flex; flex-direction:column; gap:18px; align-items:center;">
-      <section class="card">
+    <!-- الشاشة الرئيسية (لوحة نداء الكاشير والباريستا المبسطة للآيباد) -->
+    <div id="mainBox" hidden style="width:100%; display:flex; flex-direction:column; gap:14px; align-items:center;">
+      <section class="card" style="padding:16px 20px;">
         <div class="topbar">
-          <span class="font-head" style="font-weight:900; font-size:20px;"><span data-ic="plus"></span>أوردر جديد</span>
+          <div style="display:flex; flex-direction:column; gap:2px; text-align:right;">
+            <span class="font-head" style="font-weight:900; font-size:19px;"><span class="livedot"></span>الطلبات الحالية</span>
+            <span style="font-size:12.5px; color:var(--muted);">أي عميل يمسح الكود هيظهر رقمه هنا تلقائياً</span>
+          </div>
           <span class="count" id="activeCount">0 نشط</span>
-        </div>
-        <div style="height:10px"></div>
-        <div class="order-no" style="font-size:clamp(2.2rem,10vw,3rem);" id="padView">–</div>
-        <div id="padAlert" class="pad-alert" style="display:none;"></div>
-        <div class="numpad" id="numpad">
-          <button data-d="1">1</button><button data-d="2">2</button><button data-d="3">3</button>
-          <button data-d="4">4</button><button data-d="5">5</button><button data-d="6">6</button>
-          <button data-d="7">7</button><button data-d="8">8</button><button data-d="9">9</button>
-          <button data-d="C">مسح</button><button data-d="0">0</button><button data-d="B">⌫</button>
-          <button class="btn btn-gold wide" id="addBtn" style="margin-top:4px;"><span data-ic="plus"></span>إضافة</button>
         </div>
       </section>
 
       <section class="orders" id="orders"></section>
-
-      <section class="card" style="text-align:center;">
-        <p class="status-text warm" style="font-weight:800; font-size:18px; margin:0 0 6px;">امسح الكود واستلم رقمك</p>
-        <img class="qr" id="takeQr" alt="QR الكاونتر" style="margin:10px auto; width:220px; height:220px;" />
-      </section>
     </div>
   </main>
 

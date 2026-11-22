@@ -284,7 +284,10 @@
     ordersEl.innerHTML = "";
 
     if (!keys.length) {
-      ordersEl.innerHTML = '<p class="hint" style="grid-column:1/-1; text-align:center; padding:30px 0; font-size:16px;">مفيش أوردرات نشطة حالياً</p>';
+      ordersEl.innerHTML =
+        '<div class="card" style="grid-column:1/-1; text-align:center; padding:42px 20px;">' +
+        '<p class="hint" style="font-size:16px; margin:0;">مفيش طلبات حالياً.. أول ما عميل يمسح الكود هيظهر رقمه هنا تلقائياً</p>' +
+        '</div>';
       return;
     }
 
@@ -302,9 +305,12 @@
       card.className = "order-card" + (isReady ? " is-ready" : "");
       card.dataset.order = order;
 
-      const orderTrackUrl = trackUrl(order);
-
       card.innerHTML =
+        '<div style="display:inline-block; padding:4px 12px; border-radius:99px; font-size:12px; font-weight:800; margin-bottom:8px; ' +
+        (isReady
+          ? 'background:rgba(212,175,55,0.22); color:var(--gold-bright); border:1px solid rgba(212,175,55,0.5);'
+          : 'background:rgba(255,255,255,0.06); color:var(--muted); border:1px solid rgba(255,255,255,0.12);') +
+        '">' + (isReady ? "تم النداء — جاهز للاستلام" : "قيد التحضير") + "</div>" +
         '<div class="num">#' + escapeHtml(order) + "</div>" +
         (o.name ? '<div class="customer-badge"><span data-ic="user"></span>' + escapeHtml(o.name) + '</div>' : '') +
         '<div class="timer" data-t="' + o.createdAt + '"><span class="livedot"></span>' + fmt(Date.now() - o.createdAt) + "</div>" +
@@ -316,11 +322,7 @@
           ? '<button class="btn btn-gold" data-a="recall"><span data-ic="refresh"></span>إعادة النداء</button>'
           : '<button class="btn btn-gold" data-a="ready"><span data-ic="bell"></span>جاهز للاستلام</button>') +
         '<button class="btn btn-red" data-a="done"><span data-ic="check"></span>تم التسليم</button>' +
-        "</div>" +
-        '<div class="card-qr-box">' +
-        '<img class="card-qr-img" src="' + qrSrc(orderTrackUrl) + '" alt="QR #' + escapeHtml(order) + '" />' +
-        '<div class="card-qr-sub">امسح لمتابعة طلبك</div>' +
-        '</div>';
+        "</div>";
 
       card.querySelector('[data-a="ready"]')?.addEventListener("click", () => setStatus(order, "ready"));
       card.querySelector('[data-a="recall"]')?.addEventListener("click", () => setStatus(order, "ready", true));
@@ -332,58 +334,12 @@
     if (window.EmadIcons) window.EmadIcons.hydrate(ordersEl);
   }
 
-  /* ---------- نافذة عرض QR المنفصلة على الكاونتر ---------- */
-  function showCounterQrModal(order, url) {
-    let modal = $("qrPopupModal");
-    if (!modal) {
-      modal = document.createElement("div");
-      modal.id = "qrPopupModal";
-      modal.className = "modal-overlay";
-      modal.innerHTML =
-        '<div class="modal-content" style="text-align:center;">' +
-        '<div class="modal-header">' +
-        '<span style="font-weight:800; font-size:16px; color:var(--gold);">كود العميل</span>' +
-        '<button class="modal-close" id="qrPopupClose"><span data-ic="close"></span></button>' +
-        '</div>' +
-        '<div class="order-no" id="qrPopupOrderNo"></div>' +
-        '<img id="qrPopupImg" class="qr" style="width:240px; height:240px; margin:16px auto;" />' +
-        '<p class="hint">امسح الكود لمتابعة طلبك</p>' +
-        '</div>';
-      document.body.appendChild(modal);
-      modal.querySelector("#qrPopupClose").addEventListener("click", () => {
-        modal.hidden = true;
-      });
-    }
-    modal.querySelector("#qrPopupOrderNo").textContent = "#" + order;
-    modal.querySelector("#qrPopupImg").src = qrSrc(url);
-    modal.hidden = false;
-    if (window.EmadIcons) window.EmadIcons.hydrate(modal);
-  }
-
   // تحديث عدادات الوقت كل ثانية
   setInterval(() => {
     document.querySelectorAll(".timer[data-t]").forEach((el) => {
       el.innerHTML = '<span class="livedot"></span>' + fmt(Date.now() - Number(el.dataset.t));
     });
   }, 1000);
-
-  /* ---------- كيباد الأرقام (Numpad) ---------- */
-  $("numpad").addEventListener("click", (e) => {
-    const b = e.target.closest("button[data-d]");
-    if (!b || b.id === "addBtn") return;
-    const d = b.dataset.d;
-    if (d === "C") pad = "";
-    else if (d === "B") pad = pad.slice(0, -1);
-    else if (pad.length < 5) pad += d;
-    $("padView").textContent = pad === "" ? "–" : "#" + pad;
-  });
-
-  $("addBtn").addEventListener("click", () => {
-    if (!pad) return;
-    addOrder(pad);
-    pad = "";
-    $("padView").textContent = "–";
-  });
 
   /* ---------- إقلاع الشاشة (Boot) ---------- */
   function boot() {
