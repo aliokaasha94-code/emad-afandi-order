@@ -292,6 +292,7 @@
       if (isOnWay) {
         // العميل ضغط "أنا جاي" سابقاً: اكتم الصوت وعطّل الزر
         alertSilenced = true;
+        document.body.classList.add("is-silenced");
         if (window.EmadSound) window.EmadSound.stopChimeLoop();
         if (onWayBtn) {
           onWayBtn.disabled = true;
@@ -303,6 +304,7 @@
       } else {
         // جاهز جديد، أو الكاشير ضغط "إعادة النداء": فك الكتم واشحن الزر ورن مجدداً!
         alertSilenced = false;
+        document.body.classList.remove("is-silenced");
         if (onWayBtn) {
           onWayBtn.disabled = false;
           onWayBtn.style.background = "";
@@ -340,6 +342,7 @@
   /* ---------- إرسال إشارة "أنا جاي" للكاشير ---------- */
   async function sendOnWay() {
     alertSilenced = true;
+    document.body.classList.add("is-silenced");
     if (window.EmadSound) window.EmadSound.stopChimeLoop();
 
     const onWayIcon = $("onWayIcon");
