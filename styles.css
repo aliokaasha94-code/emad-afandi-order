@@ -130,26 +130,6 @@ body::after {
   margin-top: 4px;
 }
 
-.gold-line {
-  position: relative;
-  width: 170px;
-  height: 1px;
-  margin: 14px auto 0;
-  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.9) 50%, transparent);
-}
-.gold-line::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 7px;
-  height: 7px;
-  background: var(--gold-bright);
-  border-radius: 1px;
-  transform: translate(-50%, -50%) rotate(45deg);
-  box-shadow: 0 0 12px rgba(212, 175, 55, 0.85);
-}
-
 /* ============================================================
    تصميم التذكرة الفندقية الفاخرة (Perforated Luxury Ticket)
    ============================================================ */
@@ -481,25 +461,20 @@ body.is-ready .brand .sub {
   font-size: 13px;
   margin-top: 2px;
 }
-body.is-ready .gold-line {
-  margin: 8px auto 0;
-  width: 110px;
-}
-
-/* وميض بصري على حواف الشاشة عند الجاهزية كحل احتياطي لو الموبايل صامت */
+/* وميض رفيع على حواف الشاشة فقط عند الجاهزية كحل احتياطي لو الموبايل صامت */
 body.is-ready:not(.is-silenced)::after {
   content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 50;
-  box-shadow: inset 0 0 42px rgba(242, 213, 126, 0.72);
-  animation: readyBeacon 1.25s ease-in-out infinite;
+  box-shadow: inset 0 0 0 2.5px rgba(242, 213, 126, 0.85), inset 0 0 12px rgba(212, 175, 55, 0.28);
+  animation: readyBeacon 1.4s ease-in-out infinite;
 }
 
 @keyframes readyBeacon {
   0%, 100% { opacity: 0.25; }
-  50% { opacity: 1; }
+  50% { opacity: 0.95; }
 }
 
 .ready-title {

@@ -92,9 +92,9 @@
   // الرنة الفندقية العالية: دينج - دونج مع رنين واهتزاز
   function playPagerChime() {
     // تشغيل الاهتزاز بقوة على الموبايل
-    if (typeof navigator !== "undefined" && navigator.vibrate) {
+    if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
       try {
-        navigator.vibrate([400, 150, 400, 150, 700]);
+        navigator.vibrate([500, 150, 500, 150, 800]);
       } catch (e) {}
     }
 
@@ -135,7 +135,10 @@
   }
 
   function startChimeLoop(everyMs) {
-    stopChimeLoop();
+    if (loopTimer) {
+      clearInterval(loopTimer);
+      loopTimer = null;
+    }
     playPagerChime();
     loopTimer = setInterval(playPagerChime, everyMs || 3000);
   }
@@ -223,9 +226,9 @@
     if (c && c.state !== "suspended") {
       tone(TONE_2, c.currentTime + 0.02, 0.4, 0.7);
     }
-    if (typeof navigator !== "undefined" && navigator.vibrate) {
+    if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
       try {
-        navigator.vibrate([100, 50, 100]);
+        navigator.vibrate([180, 60, 180]);
       } catch (e) {}
     }
   }
